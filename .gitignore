@@ -3,6 +3,7 @@ Thumbs.db
 ehthumbs.db
 
 #Visual Studio Files
+*.sdf
 *.pyproj
 *.suo
 *.sln
