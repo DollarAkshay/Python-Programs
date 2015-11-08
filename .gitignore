@@ -8,6 +8,7 @@ ehthumbs.db
 *.suo
 *.sln
 *.user
+/Debug
 /@Visual Studio Files
 
 # Folder config file
