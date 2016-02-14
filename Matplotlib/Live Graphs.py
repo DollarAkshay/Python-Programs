@@ -9,8 +9,8 @@ lgbase = 2
 
 def animate(k):
     global lgbase
-    x = list(range(1,1001))
-    y = [math.log(i,lgbase) for i in x]
+    x = list(range(1,lgbase))
+    y = [math.log(i,2) for i in x]
     plt1.plot(x,y)
     lgbase+=1
     
