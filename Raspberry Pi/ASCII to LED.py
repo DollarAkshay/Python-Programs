@@ -2,6 +2,8 @@ import RPi.GPIO as GPIO
 import sys
 import time
 
+#Adding a Comment from Raspberry Pi
+
 out_pins = [29, 31, 33, 35, 36, 37, 38, 40]
 
 GPIO.setmode(GPIO.BOARD)
