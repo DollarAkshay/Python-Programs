@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import sys
 import time
 
-#Adding a Comment from Raspberry Pi
+#Adding a Comment from Raspberry Pi 3
 
 out_pins = [29, 31, 33, 35, 36, 37, 38, 40]
 
