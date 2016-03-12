@@ -2,14 +2,13 @@ import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
-from drawnow import *
 import time
 
 speed_sound = 348 
 echo = 7
 trig = 11
 dist = [0]*30
-times = list(range(20))
+times = list(range(30))
 
 def measure():
     GPIO.output(trig , True)
@@ -23,30 +22,37 @@ def measure():
     while GPIO.input(echo) == 1:
         stop = time.time()
 
-    return round((stop-start)*speed_sound*100/2 , 4)
+    return round((stop-start)*speed_sound*100/2    , 4)
 
-def makefig():
-    plt.title("Distance Graph")
+
+def animate(i):
+    dist.pop(0)
+    dist.append(measure())
+    
+    plt.cla()
+    plt.title("Distance Plotter")
     plt.ylabel("Distance")
-    plt.xlabel("Reading")
+    plt.xlabel("Reading #")
     plt.ylim(0, 70)
     plt.grid(True)
-    plt.plot(dist, 'ro-', label="Distance cm")
+    plt.plot(dist, 'bo-', label='Distance cm')
+    plt.legend(loc='upper left')
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(trig, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(echo, GPIO.IN)
-plt.ion()
 
-time.sleep(1)
+fig = plt.figure()
+
+
+
+time.sleep(2)
+init_time = time.time()
+
 
 try:
-    while True:
-        dist.pop(0)
-        dist.append(measure())
-        drawnow(makefig)
-        plt.pause(0.001)
-        
+    ani = animation.FuncAnimation(fig, animate)
+    plt.show()
 except KeyboardInterrupt:
     print ("Forced Key Exit")
 except:
