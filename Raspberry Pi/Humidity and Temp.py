@@ -1,4 +1,7 @@
 import RPi.GPIO as GPIO
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
 import time
 
 def bin2dec(string_num):
@@ -6,82 +9,33 @@ def bin2dec(string_num):
 
 data = []
 
-GPIO.setmode(GPIO.BCM)
+pini = 7
 
-GPIO.setup(4,GPIO.OUT)
-GPIO.output(4,GPIO.HIGH)
+GPIO.setmode(GPIO.BOARD)
+
+GPIO.setup(pini,GPIO.OUT)
+GPIO.output(pini,GPIO.HIGH)
 time.sleep(0.025)
-GPIO.output(4,GPIO.LOW)
+GPIO.output(pini,GPIO.LOW)
 time.sleep(0.02)
+GPIO.setup(pini, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-for i in range(0,500):
-    data.append(GPIO.input(4))
+for i in range(0,1700):
+    data.append(GPIO.input(pini))
 
-bit_count = 0
-tmp = 0
-count = 0
-HumidityBit = ""
-TemperatureBit = ""
-crc = ""
+data2 = []
 
+fig = plt.figure()
 try:
-   while data[count] == 1:
-      tmp = 1
-      count = count + 1
-
-   for i in range(0, 32):
-      bit_count = 0
-
-      while data[count] == 0:
-         tmp = 1
-         count = count + 1
-
-      while data[count] == 1:
-         bit_count = bit_count + 1
-         count = count + 1
-
-      if bit_count > 3:
-         if i>=0 and i<8:
-            HumidityBit = HumidityBit + "1"
-         if i>=16 and i<24:
-            TemperatureBit = TemperatureBit + "1"
-      else:
-         if i>=0 and i<8:
-            HumidityBit = HumidityBit + "0"
-         if i>=16 and i<24:
-            TemperatureBit = TemperatureBit + "0"
-
+    plt.plot(data)
+    plt.ylim(-0.5, 1.5)
+    plt.show()
+except KeyboardInterrupt:
+    print ("Forced Key Exit")
 except:
-   print "ERR_RANGE"
-   exit(0)
+    pass
+finally:  
+    GPIO.cleanup()
+    print ("GPIO Cleaned")
 
-try:
-   for i in range(0, 8):
-      bit_count = 0
-
-      while data[count] == 0:
-         tmp = 1
-         count = count + 1
-
-      while data[count] == 1:
-         bit_count = bit_count + 1
-         count = count + 1
-
-      if bit_count > 3:
-         crc = crc + "1"
-      else:
-         crc = crc + "0"
-except:
-   print "ERR_RANGE"
-   exit(0)
-
-Humidity = bin2dec(HumidityBit)
-Temperature = bin2dec(TemperatureBit)
-
-if int(Humidity) + int(Temperature) - int(bin2dec(crc)) == 0:
-   print Humidity
-   print Temperature
-else:
-   print "ERR_CRC"
