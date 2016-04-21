@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib as plt
 
-img = cv2.imread('OpenCV/Images/Cup.jpeg')
+img = cv2.imread('OpenCV/Images/cup.png')
 
 cv2.line(img, (0,0), (400, 200), (100, 0, 255), thickness=8)
 
