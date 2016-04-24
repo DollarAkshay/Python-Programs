@@ -33,7 +33,7 @@ def animate(i):
     plt.title("Distance Plotter")
     plt.ylabel("Distance")
     plt.xlabel("Reading #")
-    plt.ylim(0, 500)
+    plt.ylim(0, 100)
     plt.grid(True)
     plt.plot(dist, 'bo-', label='Distance cm')
     plt.legend(loc='upper left')

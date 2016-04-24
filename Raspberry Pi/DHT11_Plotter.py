@@ -20,10 +20,10 @@ def animate(i):
     plt.cla()
     plt.title("Distance Plotter")
     plt.xlabel("Reading #")
-    plt.ylim(0, 80)
+    plt.ylim(0, 100)
     plt.grid(True)
-    plt.plot(temp, 'bo-', label='Temp C')
-    plt.plot(hum, 'ro-', label='Humidity %')
+    plt.plot(temp, 'ro-', label='Temp C')
+    plt.plot(hum, 'bo-', label='Humidity %')
     plt.legend(loc='best')
     
 
