@@ -2,6 +2,8 @@
 import numpy as np
 import matplotlib as plt
 
+print(cv2.__version__)
+
 img = cv2.imread('OpenCV/Images/Cup.jpeg', cv2.IMREAD_COLOR)
 
 cv2.imshow('image', img)
