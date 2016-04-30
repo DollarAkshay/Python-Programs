@@ -2,11 +2,11 @@ import RPi.GPIO as GPIO
 import time
 import curses
 
-leftf = 16
-leftb = 18
+leftf = 11
+leftb = 13
 
-rightf = 13
-rightb = 11
+rightf = 16
+rightb = 18
 
 def moveright():
     GPIO.output(leftf, 1)
