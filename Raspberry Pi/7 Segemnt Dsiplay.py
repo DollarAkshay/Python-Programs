@@ -13,6 +13,7 @@ try:
         for pin in segment:
             GPIO.output(pin, 1)
             time.sleep(0.25)
+        time.sleep(5)
         for pin in segment:
             GPIO.output(pin, 0)
             time.sleep(0.25)
