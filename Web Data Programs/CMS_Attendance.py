@@ -12,7 +12,7 @@ HOST = ""
 PORT = 3306
 USER = ""
 PASS = ""
-DB = "dolla321_BNMIT_CMS"
+DB = "dolla321_bnmit_cms"
 
 encHOST = file.readline().rstrip('\n');
 encUSER = file.readline().rstrip('\n');
@@ -59,7 +59,7 @@ try:
     finally :
         connection.commit();
 
-    cursor.execute("SELECT * FROM `Users` ")
+    cursor.execute("SELECT * FROM `Users` ORDER BY `Last Updated` ")
     result = cursor.fetchall()
 
     # Execute Script for Each User
@@ -69,14 +69,23 @@ try:
         userInfo = row[2]
 
         # Login to CMS
-        print("Loging in for "+usn)
+        print("\n\nLoging in for "+usn)
         email_input = driver.find_element_by_id("edit-name")
         pass_input = driver.find_element_by_id("edit-pass")
         submit_input = driver.find_element_by_id("edit-submit")
+        email_input.clear();
+        pass_input.clear();
         email_input.send_keys(usn)
         pass_input.send_keys(password)
         submit_input.click()
 
+        try:
+            email_input = driver.find_element_by_id("edit-name")
+            print("Invalid Login")
+            continue
+        except Exception as e:
+            pass
+            
         name = driver.find_element_by_id("tnet-contentheading").text;
 
         # Update Name if it is NULL
@@ -100,8 +109,7 @@ try:
 
 
         #Go to attendance page
-        attendance_button = driver.find_elements_by_xpath("//a[contains(@class, 'sexybutton sexysimple sexyblue sexysmall')]")[1]
-        attendance_button.click()
+        driver.get('http://bnmit.pupilpod.in/tnet?dj12aWV3X2F0dGVuZGFuY2VfcHJvZ3JhbV90YWJzJmZlYXR1cmVfaWQ9YWNhZGVtaWNz')
 
         #Retrive Attendance
         print("Updating attendance for "+name);
@@ -123,6 +131,15 @@ try:
                 print(str(e))
             finally :
                 connection.commit();
+                
+        try :
+            now_time = str(datetime.datetime.now())[:19]
+            sql = "UPDATE `Users` SET `Last Updated`= '"+now_time+"' WHERE `USN` = '"+usn+"' "
+            cursor.execute(sql)
+        except Exception as e:
+            print(str(e))
+        finally :
+            connection.commit();
 
         #Logout
         logout_button = driver.find_element_by_partial_link_text("Logout");
