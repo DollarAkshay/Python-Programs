@@ -113,26 +113,27 @@ def replayBestBots(bestNeuralNets, steps, sleep):
 
 def uploadSimulation():
     
-    choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
-    if choice=='Y' or choice=='y':
-        partialKey = input("\nEnter last 2 characters of API Key : ")
+    #choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
+    #if choice=='Y' or choice=='y':
+        #partialKey = input("\nEnter last 2 characters of API Key : ")
+        partialKey = 'cQ'
         gym.upload('Artificial Intelligence/CartPole v1', api_key='sk_pwRfoNpISVKq3o88csB'+partialKey)
 
 
 
-MAX_GENERATIONS = 20
+MAX_GENERATIONS = 100
 MAX_STEPS = 500 
-POPULATION_COUNT = 100
+POPULATION_COUNT = 200
 MUTATION_RATE = 0.001
 
 
 env = gym.make('CartPole-v1')
-#env.monitor.start('Artificial Intelligence/CartPole v1', force=True)
+env.monitor.start('Artificial Intelligence/CartPole v1', force=True)
 observation = env.reset()
 
 in_dimen = env.observation_space.shape[0]
 out_dimen = env.action_space.n
-pop = Population(POPULATION_COUNT, MUTATION_RATE, [in_dimen, 8, 5, out_dimen])
+pop = Population(POPULATION_COUNT, MUTATION_RATE, [in_dimen, 8, 8, out_dimen])
 
 bestNeuralNets = []
 
@@ -162,13 +163,13 @@ for gen in range(MAX_GENERATIONS):
     print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen+1, genAvgFit, maxFit) )
     pop.createNewGeneration()
         
-#env.monitor.close()
+env.monitor.close()
 
 uploadSimulation()
 
 
-choice = input("Do you want to watch the replay ?[Y/N] : ")
-if choice=='Y' or choice=='y':
-    replayBestBots(bestNeuralNets, int(math.ceil(MAX_GENERATIONS/10.0)), 0.0625)
+#choice = input("Do you want to watch the replay ?[Y/N] : ")
+#if choice=='Y' or choice=='y':
+#    replayBestBots(bestNeuralNets, int(math.ceil(MAX_GENERATIONS/10.0)), 0.0625)
 
 
