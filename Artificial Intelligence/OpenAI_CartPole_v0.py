@@ -98,6 +98,7 @@ class Population :
 
 
 def replayBestBots(bestNeuralNets, steps, sleep):  
+    env.monitor.start('Artificial Intelligence/CartPole v0', force=True, video_callable=lambda count: count % 10 == 0)
     for i in range(len(bestNeuralNets)):
         if i%steps == 0 :
             observation = env.reset()
@@ -109,6 +110,8 @@ def replayBestBots(bestNeuralNets, steps, sleep):
                 observation, reward, done, info = env.step(action)
                 if done:
                     break
+
+    env.monitor.close()
             
 
 def uploadSimulation():
@@ -120,14 +123,14 @@ def uploadSimulation():
 
 
 
-MAX_GENERATIONS = 20
+MAX_GENERATIONS = 150
 MAX_STEPS = 200 
-POPULATION_COUNT = 100
+POPULATION_COUNT = 40
 MUTATION_RATE = 0.001
 
 
 env = gym.make('CartPole-v0')
-env.monitor.start('Artificial Intelligence/CartPole v0', force=True)
+
 observation = env.reset()
 
 in_dimen = env.observation_space.shape[0]
@@ -162,13 +165,13 @@ for gen in range(MAX_GENERATIONS):
     print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen+1, genAvgFit, maxFit) )
     pop.createNewGeneration()
         
-env.monitor.close()
+choice = input("Do you want to watch the replay ?[Y/N] : ")
+if choice=='Y' or choice=='y':
+    replayBestBots(bestNeuralNets, 1, 0.0625)
 
 uploadSimulation()
 
 
-choice = input("Do you want to watch the replay ?[Y/N] : ")
-if choice=='Y' or choice=='y':
-    replayBestBots(bestNeuralNets, int(math.ceil(MAX_GENERATIONS/10.0)), 0.0625)
+
 
 
