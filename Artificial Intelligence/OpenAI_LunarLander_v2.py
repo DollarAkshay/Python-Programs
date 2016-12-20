@@ -6,7 +6,7 @@ import numpy as np
 
 class NeuralNet : 
     def __init__(self, nodeCount):     
-        self.fitness = 0
+        self.fitness = 0.0
         self.nodeCount = nodeCount
         self.weights = []
         self.biases = []
@@ -43,7 +43,7 @@ class NeuralNet :
         output = input
         for i in range(len(self.nodeCount)-1):
             output = np.reshape( np.matmul(output, self.weights[i]) + self.biases[i], (self.nodeCount[i+1]))
-        return np.argmax(sigmoid(output))
+        return np.argmax(output)
 
 
 class Population :
@@ -57,27 +57,42 @@ class Population :
     def createChild(self, nn1, nn2):
         
         child = NeuralNet(self.nodeCount)
-
         for i in range(len(child.weights)):
             for j in range(len(child.weights[i])):
                 for k in range(len(child.weights[i][j])):
                     if random.random() > self.m_rate:
-                        child.weights[i][j][k] = (nn1.weights[i][j][k] + nn2.weights[i][j][k])/2.0
+                        if random.random() < nn1.fitness / (nn1.fitness+nn2.fitness):
+                            child.weights[i][j][k] = nn1.weights[i][j][k]
+                        else :
+                            child.weights[i][j][k] = nn2.weights[i][j][k]
+                        
 
         for i in range(len(child.biases)):
             for j in range(len(child.biases[i])):
                 if random.random() > self.m_rate:
-                    child.biases[i][j] = (nn1.biases[i][j] + nn2.biases[i][j])/2.0
+                    if random.random() < nn1.fitness / (nn1.fitness+nn2.fitness):
+                        child.biases[i][j] = nn1.biases[i][j]
+                    else:
+                        child.biases[i][j] = nn2.biases[i][j]
 
         return child
 
 
-    def createNewGeneration(self, bestNN):       
+    def createNewGeneration(self, bestNN):    
+
         nextGen = []
+        self.population.sort(key=lambda x: x.fitness, reverse=True)
+        
+        for i in range(int(self.popCount*0.1)):
+            self.population[self.popCount-1-i] = copy.deepcopy(self.population[i]);
+
+
         nextGen.append(copy.deepcopy(bestNN))
         fitnessSum = [0]
+        minFit = min([i.fitness for i in self.population])
+
         for i in range(len(self.population)):
-            fitnessSum.append(fitnessSum[i]+self.population[i].fitness**3)
+            fitnessSum.append(fitnessSum[i]+(self.population[i].fitness-minFit)**4)
         
         while(len(nextGen) < self.popCount):
             r1 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
@@ -100,10 +115,10 @@ def replayBestBots(bestNeuralNets, steps, sleep):
             for step in range(MAX_STEPS):
                 env.render()
                 time.sleep(sleep)
-                observation = normalizeArray( observation, obsMin, obsMax)
                 action = bestNeuralNets[i].getOutput(observation)
                 observation, reward, done, info = env.step(action)
                 if done:
+                    observation = env.reset()
                     break
             print("Steps taken =", step)
             
@@ -133,27 +148,22 @@ def normalizeArray(aVal, aMin, aMax):
         res.append( mapRange(aVal[i], aMin[i], aMax[i], -1, 1) )
     return res
 
-def scaleArray(aVal, aMin, aMax): 
-
-    
+def scaleArray(aVal, aMin, aMax):   
     res = []
     for i in range(len(aVal)):
         res.append( mapRange(aVal[i], -1, 1, aMin[i], aMax[i]) )
     return res
 
 
-GAME = 'Acrobot-v1'
+GAME = 'LunarLander-v2'
 RECORD = None
 MAX_STEPS = 500
-MIN_REWARD = -1
-MAX_REWARD = 0
-MAX_GENERATIONS = 50
-POPULATION_COUNT = 50
-MUTATION_RATE = 0.01
-uploadSimulation()
+MAX_GENERATIONS = 1000
+POPULATION_COUNT = 100
+MUTATION_RATE = 0.005
+
 env = gym.make(GAME)
 env.monitor.start('Artificial Intelligence/'+GAME, force=True, video_callable=RECORD )
-
 observation = env.reset()
 in_dimen = env.observation_space.shape[0]
 out_dimen = env.action_space.n
@@ -172,18 +182,22 @@ print("Shape :", out_dimen, " | High :", actionMax, " | Low :", actionMin,"\n")
 
 for gen in range(MAX_GENERATIONS):
     genAvgFit = 0.0
-    maxFit = 0.0
+    maxFit = -100000000
     maxNeuralNet = None
     for nn in pop.population:
+        totalReward = 0
         for step in range(MAX_STEPS):
             env.render()
-            observation = normalizeArray( observation, obsMin, obsMax)
             action = nn.getOutput(observation)
             observation, reward, done, info = env.step(action)
+            if reward == -100:
+                reward = -2000
+            totalReward += reward
             if done:
                 observation = env.reset()
                 break
-        nn.fitness = 100.0*(MAX_STEPS-step)/MAX_STEPS
+
+        nn.fitness = totalReward
         genAvgFit += nn.fitness
         if nn.fitness > maxFit :
             maxFit = nn.fitness
@@ -197,7 +211,6 @@ for gen in range(MAX_GENERATIONS):
 env.monitor.close()
 
 uploadSimulation()
-
 
 choice = input("Do you want to watch the replay ?[Y/N] : ")
 if choice=='Y' or choice=='y':
