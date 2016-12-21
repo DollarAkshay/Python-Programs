@@ -92,26 +92,51 @@ class Population :
 def sigmoid(x):
     return 1.0/(1.0 + np.exp(-x))
 
-def replayBestBots(bestNeuralNets, steps, sleep):  
-    for i in range(len(bestNeuralNets)):
-        if i%steps == 0 :
-            observation = env.reset()
-            print("Generation %3d had a best fitness of %4d" % (i, bestNeuralNets[i].fitness))
-            for step in range(MAX_STEPS):
-                env.render()
-                time.sleep(sleep)
-                observation = normalizeArray( observation, obsMin, obsMax)
-                action = bestNeuralNets[i].getOutput(observation)
-                observation, reward, done, info = env.step(action)
-                if done:
-                    break
-            print("Steps taken =", step)
+
+def replayBestBots(bestNeuralNets, steps, sleep):
+    choice = input("Do you want to watch the replay ?[Y/N] : ")
+    if choice=='Y' or choice=='y':  
+        for i in range(1, len(bestNeuralNets)):
+            if i%steps == 0 :
+                observation = env.reset()
+                for step in range(MAX_STEPS):
+                    env.render()
+                    time.sleep(sleep)
+                    observation = normalizeArray( observation, obsMin, obsMax)
+                    action = bestNeuralNets[i].getOutput(observation)
+                    observation, reward, done, info = env.step(action)
+                    if done:
+                        break
+                totalReward = 100.0*(MAX_STEPS-step)/MAX_STEPS
+                print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i, bestNeuralNets[i].fitness, totalReward))
+
+
+def recordBestBots(bestNeuralNets):  
+    print("\n Recording Best Bots ")
+    print("---------------------")
+    env.monitor.start('Artificial Intelligence/'+GAME, force=True )
+    observation = env.reset()
+    for i in range(1, len(bestNeuralNets)):
+        print("Generation %3d had a best fitness of %4d" % (i, bestNeuralNets[i].fitness))
+        for step in range(MAX_STEPS):
+            env.render()
+            observation = normalizeArray( observation, obsMin, obsMax)
+            action = bestNeuralNets[i].getOutput(observation)
+            observation, reward, done, info = env.step(action)
+            if done:
+                observation = env.reset()
+                break
+        totalReward = 100.0*(MAX_STEPS-step)/MAX_STEPS
+        print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i, bestNeuralNets[i].fitness, totalReward))
+    env.monitor.close()
+
             
 def uploadSimulation():
     choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
     if choice=='Y' or choice=='y':
-        partialKey = input("\nEnter last 2 characters of API Key : ")
-        gym.upload('Artificial Intelligence/'+GAME, api_key='sk_pwRfoNpISVKq3o88csB'+partialKey)
+        API_KEY = open('home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read()
+        gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
+
 
 
 
@@ -170,7 +195,7 @@ print("\nAction\n--------------------------------")
 print("Shape :", out_dimen, " | High :", actionMax, " | Low :", actionMin,"\n")
 
 
-for gen in range(MAX_GENERATIONS):
+for gen in range(1, MAX_GENERATIONS):
     genAvgFit = 0.0
     maxFit = 0.0
     maxNeuralNet = None
@@ -191,16 +216,13 @@ for gen in range(MAX_GENERATIONS):
 
     bestNeuralNets.append(maxNeuralNet)
     genAvgFit/=pop.popCount
-    print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen+1, genAvgFit, maxFit) )
+    print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen, genAvgFit, maxFit) )
     pop.createNewGeneration(maxNeuralNet)
         
 env.monitor.close()
 
 uploadSimulation()
 
-
-choice = input("Do you want to watch the replay ?[Y/N] : ")
-if choice=='Y' or choice=='y':
-    replayBestBots(bestNeuralNets, max(1, int(math.ceil(MAX_GENERATIONS/10.0))), 0.0625)
+replayBestBots(bestNeuralNets, math.ceil(MAX_GENERATIONS/10), 0.0625)
 
 

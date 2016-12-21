@@ -109,10 +109,9 @@ def replayBestBots(bestNeuralNets, steps, sleep):
                     break
             
 def uploadSimulation():
-    choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
-    if choice=='Y' or choice=='y':
-        partialKey = input("\nEnter last 2 characters of API Key : ")
-        gym.upload('Artificial Intelligence/Pendulum v1', api_key='sk_pwRfoNpISVKq3o88csB'+partialKey)
+    API_KEY = open('home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read()
+    gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
+
 
 
 

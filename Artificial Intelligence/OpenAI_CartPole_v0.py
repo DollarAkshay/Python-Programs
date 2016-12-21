@@ -51,7 +51,6 @@ class NeuralNet :
 
 
 class Population :
-
     def __init__(self, populationCount, mutationRate, nodeCount):
         self.nodeCount = nodeCount
         self.popCount = populationCount
@@ -62,75 +61,108 @@ class Population :
     def createChild(self, nn1, nn2):
         
         child = NeuralNet(self.nodeCount)
-
         for i in range(len(child.weights)):
             for j in range(len(child.weights[i])):
                 for k in range(len(child.weights[i][j])):
-                    if random.random() < self.m_rate:
-                        child.weights[i][j][k] = random.uniform(-1, 1)
-                    else:
-                        child.weights[i][j][k] = (nn1.weights[i][j][k] + nn2.weights[i][j][k])/2.0
+                    if random.random() > self.m_rate:
+                        if random.random() < nn1.fitness / (nn1.fitness+nn2.fitness):
+                            child.weights[i][j][k] = nn1.weights[i][j][k]
+                        else :
+                            child.weights[i][j][k] = nn2.weights[i][j][k]
+                        
 
         for i in range(len(child.biases)):
             for j in range(len(child.biases[i])):
-                if random.random() < self.m_rate:
-                    child.biases[i][j] = random.uniform(-1, 1)
-                else:
-                    child.biases[i][j] = (nn1.biases[i][j] + nn2.biases[i][j])/2.0
+                if random.random() > self.m_rate:
+                    if random.random() < nn1.fitness / (nn1.fitness+nn2.fitness):
+                        child.biases[i][j] = nn1.biases[i][j]
+                    else:
+                        child.biases[i][j] = nn2.biases[i][j]
 
         return child
 
 
-    def createNewGeneration(self):       
+    def createNewGeneration(self, bestNN):    
         nextGen = []
+        self.population.sort(key=lambda x: x.fitness, reverse=True)
+        for i in range(self.popCount):
+            if random.random() < float(self.popCount-i)/self.popCount:
+                nextGen.append(copy.deepcopy(self.population[i]));
+
         fitnessSum = [0]
-        for i in range(len(self.population)):
-            fitnessSum.append(fitnessSum[i]+self.population[i].fitness)
+        minFit = min([i.fitness for i in nextGen])
+        for i in range(len(nextGen)):
+            fitnessSum.append(fitnessSum[i]+(nextGen[i].fitness-minFit)**4)
         
+
         while(len(nextGen) < self.popCount):
             r1 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
             r2 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
-            nn1 = self.population[bisect.bisect_right(fitnessSum, r1)-1]
-            nn2 = self.population[bisect.bisect_right(fitnessSum, r2)-1]
-            nextGen.append( self.createChild(nn1, nn2) )
+            i1 = bisect.bisect_left(fitnessSum, r1)
+            i2 = bisect.bisect_left(fitnessSum, r2)
+            if 0 <= i1 < len(nextGen) and 0 <= i2 < len(nextGen) :
+                nextGen.append( self.createChild(nextGen[i1], nextGen[i2]) )
+            else :
+                print("Index Error ");
+                print("Sum Array =",fitnessSum)
+                print("Randoms = ", r1, r2)
+                print("Indices = ", i1, i2)
         self.population.clear()
         self.population = nextGen
 
 
 def replayBestBots(bestNeuralNets, steps, sleep):  
-    env.monitor.start('Artificial Intelligence/CartPole v0', force=True, video_callable=lambda count: count % 10 == 0)
-    for i in range(len(bestNeuralNets)):
-        if i%steps == 0 :
-            observation = env.reset()
-            print("Generation %3d had a best fitness of %4d" % (i, bestNeuralNets[i].fitness))
-            for step in range(MAX_STEPS):
-                env.render()
-                time.sleep(sleep)
-                action = bestNeuralNets[i].getOutput(observation)
-                observation, reward, done, info = env.step(action)
-                if done:
-                    break
+    choice = input("\nDo you want to watch the replay ?[Y/N] : ")
+    if choice=='Y' or choice=='y':
+        for i in range(1, len(bestNeuralNets)):
+            if i%steps == 0 :
+                observation = env.reset()
+                totalReward = 0
+                for step in range(MAX_STEPS):
+                    env.render()
+                    time.sleep(sleep)
+                    action = bestNeuralNets[i].getOutput(observation)
+                    observation, reward, done, info = env.step(action)
+                    totalReward+=reward
+                    if done:
+                        observation = env.reset()
+                        break
+                print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i, bestNeuralNets[i].fitness, totalReward))
 
+
+def recordBestBots(bestNeuralNets):  
+    print("\n Recording Best Bots ")
+    print("---------------------")
+    env.monitor.start('Artificial Intelligence/'+GAME, force=True)
+    observation = env.reset()
+    for i in range(1, len(bestNeuralNets)):
+        totalReward = 0
+        for step in range(MAX_STEPS):
+            env.render()
+            action = bestNeuralNets[i].getOutput(observation)
+            observation, reward, done, info = env.step(action)
+            totalReward+=reward
+            if done:
+                observation = env.reset()
+                break
+        print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i, bestNeuralNets[i].fitness, totalReward))
     env.monitor.close()
             
 
 def uploadSimulation():
-    
-    choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
-    if choice=='Y' or choice=='y':
-        partialKey = input("\nEnter last 2 characters of API Key : ")
-        gym.upload('Artificial Intelligence/CartPole v0', api_key='sk_pwRfoNpISVKq3o88csB'+partialKey)
+    API_KEY = open('/home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read().rstrip()
+    gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
 
 
 
+GAME = 'CartPole-v0'
 MAX_GENERATIONS = 150
 MAX_STEPS = 200 
-POPULATION_COUNT = 40
+POPULATION_COUNT = 50
 MUTATION_RATE = 0.001
 
 
-env = gym.make('CartPole-v0')
-
+env = gym.make(GAME)
 observation = env.reset()
 
 in_dimen = env.observation_space.shape[0]
@@ -139,7 +171,7 @@ pop = Population(POPULATION_COUNT, MUTATION_RATE, [in_dimen, 8, 5, out_dimen])
 
 bestNeuralNets = []
 
-for gen in range(MAX_GENERATIONS):
+for gen in range(1, MAX_GENERATIONS):
     genAvgFit = 0.0
     maxFit = 0.0
     maxNeuralNet = None
@@ -147,7 +179,7 @@ for gen in range(MAX_GENERATIONS):
         totalReward = 0
         
         for step in range(MAX_STEPS):
-            env.render()
+            #env.render()
             action = nn.getOutput(observation)
             observation, reward, done, info = env.step(action)
             totalReward += reward
@@ -162,14 +194,22 @@ for gen in range(MAX_GENERATIONS):
 
     bestNeuralNets.append(maxNeuralNet)
     genAvgFit/=pop.popCount
-    print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen+1, genAvgFit, maxFit) )
+    print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen, genAvgFit, maxFit) )
     pop.createNewGeneration()
-        
-choice = input("Do you want to watch the replay ?[Y/N] : ")
-if choice=='Y' or choice=='y':
-    replayBestBots(bestNeuralNets, 1, 0.0625)
+
+
+
+recordBestBots(bestNeuralNets)
 
 uploadSimulation()
+
+replayBestBots(bestNeuralNets, 1, 0.0625)
+
+
+
+
+
+
 
 
 

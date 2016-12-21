@@ -43,7 +43,7 @@ class NeuralNet :
         output = input
         for i in range(len(self.nodeCount)-1):
             output = np.reshape( np.matmul(output, self.weights[i]) + self.biases[i], (self.nodeCount[i+1]))
-        return np.argmax(output)
+        return output
 
 
 class Population :
@@ -79,7 +79,6 @@ class Population :
 
 
     def createNewGeneration(self, bestNN):    
-
         nextGen = []
         self.population.sort(key=lambda x: x.fitness, reverse=True)
         for i in range(self.popCount):
@@ -178,28 +177,27 @@ def scaleArray(aVal, aMin, aMax):
     return res
 
 
-GAME = 'LunarLander-v2'
+GAME = 'BipedalWalker-v2'
 MAX_STEPS = 500
 MAX_GENERATIONS = 1000
 POPULATION_COUNT = 100
-MUTATION_RATE = 0.001
+MUTATION_RATE = 0.01
 env = gym.make(GAME)
-
+env.monitor.start('Artificial Intelligence/'+GAME, force=True)
 observation = env.reset()
 in_dimen = env.observation_space.shape[0]
-out_dimen = env.action_space.n
+out_dimen = env.action_space.shape[0]
 obsMin = env.observation_space.low
 obsMax = env.observation_space.high
-actionMin = 0
-actionMax = env.action_space.n
+actionMin = env.action_space.low
+actionMax = env.action_space.high
 pop = Population(POPULATION_COUNT, MUTATION_RATE, [in_dimen, 13, 8, 13, out_dimen])
 bestNeuralNets = []
 
 print("\nObservation\n--------------------------------")
-print("Shape :", in_dimen, " | High :", obsMax, " | Low :", obsMin)
+print("Shape :", in_dimen, " \n High :", obsMax, " \n Low :", obsMin)
 print("\nAction\n--------------------------------")
 print("Shape :", out_dimen, " | High :", actionMax, " | Low :", actionMin,"\n")
-
 
 for gen in range(1, MAX_GENERATIONS):
     genAvgFit = 0.0
@@ -208,7 +206,7 @@ for gen in range(1, MAX_GENERATIONS):
     for nn in pop.population:
         totalReward = 0
         for step in range(MAX_STEPS):
-            #env.render()
+            env.render()
             action = nn.getOutput(observation)
             observation, reward, done, info = env.step(action)
             totalReward += reward
@@ -227,8 +225,9 @@ for gen in range(1, MAX_GENERATIONS):
     print("Generation : %3d |  Avg Fitness : %5.0f  |  Max Fitness : %5.0f  " % (gen, genAvgFit, maxFit) )
     pop.createNewGeneration(maxNeuralNet)
 
+env.monitor.close()
 
-recordBestBots(bestNeuralNets)
+#recordBestBots(bestNeuralNets)
 
 uploadSimulation()
 
