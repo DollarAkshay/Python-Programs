@@ -95,15 +95,35 @@ class Population :
         while(len(nextGen) < self.popCount):
             r1 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
             r2 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
-            nn1 = nextGen[bisect.bisect_right(fitnessSum, r1)-1]
-            nn2 = nextGen[bisect.bisect_right(fitnessSum, r2)-1]
-            nextGen.append( self.createChild(nn1, nn2) )
+            i1 = bisect.bisect_left(fitnessSum, r1)
+            i2 = bisect.bisect_left(fitnessSum, r2)
+            if 0 <= i1 < len(nextGen) and 0 <= i2 < len(nextGen) :
+                nextGen.append( self.createChild(nextGen[i1], nextGen[i2]) )
+            else :
+                print("Index Error ");
+                print("Sum Array =",fitnessSum)
+                print("Randoms = ", r1, r2)
+                print("Indices = ", i1, i2)
         self.population.clear()
         self.population = nextGen
 
 
 def sigmoid(x):
     return 1.0/(1.0 + np.exp(-x))
+
+def recordBestBots(bestNeuralNets):  
+    env.monitor.start('Artificial Intelligence/'+GAME, force=True)
+    observation = env.reset()
+    for i in range(len(bestNeuralNets)):
+        print("Generation %3d had a best fitness of %4d" % (i, bestNeuralNets[i].fitness))
+        for step in range(MAX_STEPS):
+            env.render()
+            action = bestNeuralNets[i].getOutput(observation)
+            observation, reward, done, info = env.step(action)
+            if done:
+                observation = env.reset()
+                break
+    env.monitor.close()
 
 def replayBestBots(bestNeuralNets, steps, sleep):  
     for i in range(len(bestNeuralNets)):
@@ -124,7 +144,7 @@ def uploadSimulation():
     choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
     if choice=='Y' or choice=='y':
         partialKey = input("\nEnter last 2 characters of API Key : ")
-        gym.upload('Artificial Intelligence/'+GAME, api_key='sk_pwRfoNpISVKq3o88csB'+partialKey)
+    gym.upload('Artificial Intelligence/'+GAME, api_key='sk_pwRfoNpISVKq3o88csB'+partialKey)
 
 
 
@@ -154,15 +174,16 @@ def scaleArray(aVal, aMin, aMax):
 
 
 GAME = 'LunarLander-v2'
-RECORD = None
 MAX_STEPS = 200
-MAX_GENERATIONS = 1000
-POPULATION_COUNT = 100
+MAX_GENERATIONS = 10
+POPULATION_COUNT = 10
 MUTATION_RATE = 0.001
 
+random.seed(1995)
 env = gym.make(GAME)
-env.monitor.start('Artificial Intelligence/'+GAME, force=True, video_callable=RECORD )
+
 observation = env.reset()
+env.seed(1995)
 in_dimen = env.observation_space.shape[0]
 out_dimen = env.action_space.n
 obsMin = env.observation_space.low
@@ -185,12 +206,13 @@ for gen in range(MAX_GENERATIONS):
     for nn in pop.population:
         totalReward = 0
         for step in range(MAX_STEPS):
-            env.render()
+            #env.render()
             action = nn.getOutput(observation)
             observation, reward, done, info = env.step(action)
             totalReward += reward
             if done:
                 observation = env.reset()
+                env.seed(1995)
                 break
 
         nn.fitness = totalReward
@@ -203,13 +225,17 @@ for gen in range(MAX_GENERATIONS):
     genAvgFit/=pop.popCount
     print("Generation : %3d |  Avg Fitness : %5.0f  |  Max Fitness : %5.0f  " % (gen+1, genAvgFit, maxFit) )
     pop.createNewGeneration(maxNeuralNet)
-        
-env.monitor.close()
 
-uploadSimulation()
 
-choice = input("Do you want to watch the replay ?[Y/N] : ")
-if choice=='Y' or choice=='y':
-    replayBestBots(bestNeuralNets, max(1, int(math.ceil(MAX_GENERATIONS/10.0))), 0.0625)
+#recordBestBots(bestNeuralNets)
+#uploadSimulation()
+
+
+#choice = input("Do you want to watch the replay ?[Y/N] : ")
+#if choice=='Y' or choice=='y':
+#    replayBestBots(bestNeuralNets, max(1, int(math.ceil(MAX_GENERATIONS/10.0))), 0.0625)
+
+
+
 
 
