@@ -82,23 +82,21 @@ class Population :
 
         nextGen = []
         self.population.sort(key=lambda x: x.fitness, reverse=True)
-        
-        for i in range(int(self.popCount*0.1)):
-            self.population[self.popCount-1-i] = copy.deepcopy(self.population[i]);
+        for i in range(self.popCount):
+            if random.random() < float(self.popCount-i)/self.popCount:
+                nextGen.append(copy.deepcopy(self.population[i]));
 
-
-        nextGen.append(copy.deepcopy(bestNN))
         fitnessSum = [0]
-        minFit = min([i.fitness for i in self.population])
-
-        for i in range(len(self.population)):
-            fitnessSum.append(fitnessSum[i]+(self.population[i].fitness-minFit)**4)
+        minFit = min([i.fitness for i in nextGen])
+        for i in range(len(nextGen)):
+            fitnessSum.append(fitnessSum[i]+(nextGen[i].fitness-minFit)**4)
         
+
         while(len(nextGen) < self.popCount):
             r1 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
             r2 = random.uniform(0, fitnessSum[len(fitnessSum)-1] )
-            nn1 = self.population[bisect.bisect_right(fitnessSum, r1)-1]
-            nn2 = self.population[bisect.bisect_right(fitnessSum, r2)-1]
+            nn1 = nextGen[bisect.bisect_right(fitnessSum, r1)-1]
+            nn2 = nextGen[bisect.bisect_right(fitnessSum, r2)-1]
             nextGen.append( self.createChild(nn1, nn2) )
         self.population.clear()
         self.population = nextGen
@@ -157,10 +155,10 @@ def scaleArray(aVal, aMin, aMax):
 
 GAME = 'LunarLander-v2'
 RECORD = None
-MAX_STEPS = 500
+MAX_STEPS = 200
 MAX_GENERATIONS = 1000
 POPULATION_COUNT = 100
-MUTATION_RATE = 0.005
+MUTATION_RATE = 0.001
 
 env = gym.make(GAME)
 env.monitor.start('Artificial Intelligence/'+GAME, force=True, video_callable=RECORD )
@@ -171,7 +169,7 @@ obsMin = env.observation_space.low
 obsMax = env.observation_space.high
 actionMin = 0
 actionMax = env.action_space.n
-pop = Population(POPULATION_COUNT, MUTATION_RATE, [in_dimen, 8, 5, out_dimen])
+pop = Population(POPULATION_COUNT, MUTATION_RATE, [in_dimen, 13, 8, 13, out_dimen])
 bestNeuralNets = []
 
 print("\nObservation\n--------------------------------")
@@ -190,8 +188,6 @@ for gen in range(MAX_GENERATIONS):
             env.render()
             action = nn.getOutput(observation)
             observation, reward, done, info = env.step(action)
-            if reward == -100:
-                reward = -2000
             totalReward += reward
             if done:
                 observation = env.reset()
@@ -205,7 +201,7 @@ for gen in range(MAX_GENERATIONS):
 
     bestNeuralNets.append(maxNeuralNet)
     genAvgFit/=pop.popCount
-    print("Generation : %3d |  Avg Fitness : %4.0f  |  Max Fitness : %4.0f  " % (gen+1, genAvgFit, maxFit) )
+    print("Generation : %3d |  Avg Fitness : %5.0f  |  Max Fitness : %5.0f  " % (gen+1, genAvgFit, maxFit) )
     pop.createNewGeneration(maxNeuralNet)
         
 env.monitor.close()
