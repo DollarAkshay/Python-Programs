@@ -132,10 +132,8 @@ def recordBestBots(bestNeuralNets):
 
             
 def uploadSimulation():
-    choice = input("\nDo you want to upload the simulation ?[Y/N] : ")
-    if choice=='Y' or choice=='y':
-        API_KEY = open('home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read()
-        gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
+    API_KEY = open('/home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read().rstrip()
+    gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
 
 
 

@@ -1,15 +1,16 @@
 import gym
-import gym_pull
+MAX_STEPS = 20
+env = gym.make('CartPole-v0')
+env.monitor.start('/tmp/cartpole-experiment-1', force=True, video_callable=False)
 
-
-
-gym_pull.pull('github.com/ppaquette/gym-doom')
-env = gym.make('ppaquette/DoomBasic-v0')
-
-env.configure(remotes=1) # automatically creates a local docker container
-observation_n = env.reset()
-
-while True:
-    action_n = [[('KeyEvent', 'ArrowUp', True)] for ob in observation_n] # your agent here
-    observation_n, reward_n, done_n, info = env.step(action_n)
-    env.render()
+for i_episode in range(200):
+    observation = env.reset()
+    for t in range(MAX_STEPS):
+        env.render()
+        print(observation)
+        action = env.action_space.sample()
+        observation, reward, done, info = env.step(action)
+        if done:
+            print("Episode finished after {} timesteps".format(t+1))
+            break
+env.monitor.close() 

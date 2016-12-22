@@ -148,7 +148,7 @@ def recordBestBots(bestNeuralNets):
     env.monitor.close()
 
 def uploadSimulation():
-    API_KEY = open('home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read()
+    API_KEY = open('/home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read().rstrip()
     gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
 
 

@@ -114,8 +114,8 @@ def sigmoid(x):
 def replayBestBots(bestNeuralNets, steps, sleep):  
     choice = input("Do you want to watch the replay ?[Y/N] : ")
     if choice=='Y' or choice=='y':
-        for i in range(1, len(bestNeuralNets)):
-            if i%steps == 0 :
+        for i in range(len(bestNeuralNets)):
+            if (i+1)%steps == 0 :
                 observation = env.reset()
                 totalReward = 0
                 for step in range(MAX_STEPS):
@@ -125,9 +125,8 @@ def replayBestBots(bestNeuralNets, steps, sleep):
                     observation, reward, done, info = env.step(action)
                     totalReward += reward
                     if done:
-                        observation = env.reset()
                         break
-                print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i, bestNeuralNets[i].fitness, totalReward))
+                print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i+1, bestNeuralNets[i].fitness, totalReward))
 
 
 def recordBestBots(bestNeuralNets):  
@@ -135,19 +134,22 @@ def recordBestBots(bestNeuralNets):
     print("---------------------")
     env.monitor.start('Artificial Intelligence/'+GAME, force=True)
     observation = env.reset()
-    for i in range(1, len(bestNeuralNets)):
+    for i in range(len(bestNeuralNets)):
+        totalReward = 0
         for step in range(MAX_STEPS):
             env.render()
             action = bestNeuralNets[i].getOutput(observation)
             observation, reward, done, info = env.step(action)
+            totalReward += reward
             if done:
                 observation = env.reset()
                 break
-        print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i, bestNeuralNets[i].fitness, totalReward))
+        print("Generation %3d | Expected Fitness of %4d | Actual Fitness = %4d" % (i+1, bestNeuralNets[i].fitness, totalReward))
     env.monitor.close()
 
+
 def uploadSimulation():
-    API_KEY = open('home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read()
+    API_KEY = open('/home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read().rstrip()
     gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
 
 
@@ -178,13 +180,13 @@ def scaleArray(aVal, aMin, aMax):
 
 
 GAME = 'BipedalWalker-v2'
-MAX_STEPS = 500
+env = gym.make(GAME)
+
+MAX_STEPS = env.spec.timestep_limit
 MAX_GENERATIONS = 1000
 POPULATION_COUNT = 100
 MUTATION_RATE = 0.01
-env = gym.make(GAME)
-env.monitor.start('Artificial Intelligence/'+GAME, force=True)
-observation = env.reset()
+
 in_dimen = env.observation_space.shape[0]
 out_dimen = env.action_space.shape[0]
 obsMin = env.observation_space.low
@@ -199,22 +201,24 @@ print("Shape :", in_dimen, " \n High :", obsMax, " \n Low :", obsMin)
 print("\nAction\n--------------------------------")
 print("Shape :", out_dimen, " | High :", actionMax, " | Low :", actionMin,"\n")
 
-for gen in range(1, MAX_GENERATIONS):
+for gen in range(MAX_GENERATIONS):
     genAvgFit = 0.0
-    maxFit = -100000000
+    minFit =  1000000
+    maxFit = -1000000
     maxNeuralNet = None
     for nn in pop.population:
+        observation = env.reset()
         totalReward = 0
         for step in range(MAX_STEPS):
-            env.render()
+            #env.render()
             action = nn.getOutput(observation)
             observation, reward, done, info = env.step(action)
             totalReward += reward
             if done:
-                observation = env.reset()
                 break
 
         nn.fitness = totalReward
+        minFit = min(minFit, nn.fitness)
         genAvgFit += nn.fitness
         if nn.fitness > maxFit :
             maxFit = nn.fitness
@@ -222,16 +226,14 @@ for gen in range(1, MAX_GENERATIONS):
 
     bestNeuralNets.append(maxNeuralNet)
     genAvgFit/=pop.popCount
-    print("Generation : %3d |  Avg Fitness : %5.0f  |  Max Fitness : %5.0f  " % (gen, genAvgFit, maxFit) )
+    print("Generation : %3d  |  Min : %5.0f  |  Avg : %5.0f  |  Max : %5.0f  " % (gen+1, minFit, genAvgFit, maxFit) )
     pop.createNewGeneration(maxNeuralNet)
 
-env.monitor.close()
-
-#recordBestBots(bestNeuralNets)
+recordBestBots(bestNeuralNets)
 
 uploadSimulation()
 
-replayBestBots(bestNeuralNets, max(1, int(math.ceil(MAX_GENERATIONS/10.0))), 0.0625)
+replayBestBots(bestNeuralNets, max(1, int(math.ceil(MAX_GENERATIONS/10.0))), 0)
 
 
 
