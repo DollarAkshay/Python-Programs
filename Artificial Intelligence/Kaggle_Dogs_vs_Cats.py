@@ -95,7 +95,7 @@ def train_neural_network():
 
         # Train Neural Net
         print("\nTraining Neural Net ... ")
-        ephocs = 100
+        ephocs = 200
         for epoch in range(ephocs):
             epoch_loss = 0
             i = 0
