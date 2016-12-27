@@ -46,7 +46,8 @@ class NeuralNet :
         output = input
         for i in range(len(self.nodeCount)-1):
             output = np.reshape( np.matmul(output, self.weights[i]) + self.biases[i], (self.nodeCount[i+1]))
-        return output
+            output = np.maximum(output, 0)
+        return np.argmax(output)
 
 
 class Population :
@@ -177,7 +178,6 @@ def recordBestBots(bestNeuralNets):
 
 
 def loadWeights():
-    
     nodeCount = []
     weights = []
     biases = []
@@ -215,7 +215,6 @@ def loadWeights():
 def saveWeights(best):
     
     f = open('Artificial Intelligence/'+GAME+"/"+GAME+".txt", 'w')
-
     print("Node Count : ", file=f)
     for i in range(len(best.nodeCount)):
         print("%d " % best.nodeCount[i], file=f, end="");
@@ -243,21 +242,21 @@ def uploadSimulation():
 
 
 
-GAME = 'BipedalWalker-v2'
+GAME = 'MountainCar-v0'
 env = gym.make(GAME)
 
 MAX_STEPS = env.spec.timestep_limit
 MAX_GENERATIONS = 1000
-POPULATION_COUNT = 100
-MUTATION_RATE = 0.01
+POPULATION_COUNT = 50
+MUTATION_RATE = 0.1
 
 in_dimen = env.observation_space.shape[0]
-out_dimen = env.action_space.shape[0]
+out_dimen = env.action_space.n
 obsMin = env.observation_space.low
 obsMax = env.observation_space.high
-actionMin = env.action_space.low
-actionMax = env.action_space.high
-node_per_layer = [in_dimen, 13, 8, 13, out_dimen]
+actionMin = 0
+actionMax = env.action_space.n - 1 
+node_per_layer = [in_dimen, 5 , out_dimen]
 
 pop = Population(POPULATION_COUNT, MUTATION_RATE, node_per_layer, False)
 bestNeuralNets = []
@@ -279,7 +278,7 @@ try :
             observation = env.reset()
             totalReward = 0
             for step in range(MAX_STEPS):
-                if cr==-1:
+                if cr==0:
                     env.render()
                 action = nn.getOutput(observation)
                 observation, reward, done, info = env.step(action)
@@ -305,8 +304,8 @@ try :
 
 except KeyboardInterrupt:
     print("\nKeyboard Interrupt")
-except:
-    print("\nUnknown Exception")
+except Exception as e: 
+    print (str(e))
 finally :
     if len(bestNeuralNets) > 1:
         print("\nSaving Weights to file")

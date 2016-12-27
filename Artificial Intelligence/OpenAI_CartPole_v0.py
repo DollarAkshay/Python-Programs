@@ -57,9 +57,7 @@ class Population :
         self.m_rate = mutationRate
         self.population = [ NeuralNet(nodeCount) for i in range(populationCount)]
 
-
-    def createChild(self, nn1, nn2):
-        
+    def createChild(self, nn1, nn2):   
         child = NeuralNet(self.nodeCount)
         for i in range(len(child.weights)):
             for j in range(len(child.weights[i])):

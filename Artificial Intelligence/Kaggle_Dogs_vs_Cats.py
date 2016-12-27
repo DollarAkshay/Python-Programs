@@ -91,7 +91,7 @@ def train_neural_network():
     test_prediction = tf.argmax(tf.nn.softmax(output_prediction), 1)
 
     with tf.Session() as sess :
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
 
         # Train Neural Net
         print("\nTraining Neural Net ... ")

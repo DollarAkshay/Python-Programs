@@ -3,6 +3,7 @@ import gym
 import numpy as np
 
 
+
 class NeuralNet : 
     def __init__(self, nodeCount, loadFile):     
         self.fitness = 0.0
@@ -46,6 +47,7 @@ class NeuralNet :
         output = input
         for i in range(len(self.nodeCount)-1):
             output = np.reshape( np.matmul(output, self.weights[i]) + self.biases[i], (self.nodeCount[i+1]))
+            output = np.maximum(output, 0)
         return output
 
 
@@ -239,16 +241,16 @@ def saveWeights(best):
 
 def uploadSimulation():
     API_KEY = open('/home/dollarakshay/Documents/API Keys/Open AI Key.txt', 'r').read().rstrip()
-    gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)    
+    gym.upload('Artificial Intelligence/'+GAME, api_key=API_KEY)
+    
 
 
-
-GAME = 'BipedalWalker-v2'
+GAME = 'BipedalWalkerHardcore-v2'
 env = gym.make(GAME)
 
 MAX_STEPS = env.spec.timestep_limit
-MAX_GENERATIONS = 1000
-POPULATION_COUNT = 100
+MAX_GENERATIONS = 5
+POPULATION_COUNT = 10
 MUTATION_RATE = 0.01
 
 in_dimen = env.observation_space.shape[0]
