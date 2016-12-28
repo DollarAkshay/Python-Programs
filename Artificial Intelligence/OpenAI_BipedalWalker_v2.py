@@ -247,7 +247,7 @@ GAME = 'BipedalWalker-v2'
 env = gym.make(GAME)
 
 MAX_STEPS = env.spec.timestep_limit
-MAX_GENERATIONS = 1000
+MAX_GENERATIONS = 2000
 POPULATION_COUNT = 100
 MUTATION_RATE = 0.01
 
@@ -257,7 +257,7 @@ obsMin = env.observation_space.low
 obsMax = env.observation_space.high
 actionMin = env.action_space.low
 actionMax = env.action_space.high
-node_per_layer = [in_dimen, 13, 8, 13, out_dimen]
+node_per_layer = [in_dimen, 21, 13, 8, out_dimen]
 
 pop = Population(POPULATION_COUNT, MUTATION_RATE, node_per_layer, False)
 bestNeuralNets = []
