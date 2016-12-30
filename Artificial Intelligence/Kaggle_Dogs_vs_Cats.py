@@ -1,6 +1,7 @@
 
 import glob
 import os
+import random
 import PIL
 
 import matplotlib.pyplot as plt
@@ -88,45 +89,51 @@ def train_neural_network():
     loss = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(output_prediction, output_placeholder) )
     trainer = tf.train.AdamOptimizer()
     optimizer = trainer.minimize(loss)
-    test_prediction = tf.argmax(tf.nn.softmax(output_prediction), 1)
+    test_prediction = tf.nn.softmax(output_prediction)
 
     with tf.Session() as sess :
         sess.run(tf.global_variables_initializer())
 
         # Train Neural Net
         print("\nTraining Neural Net ... ")
-        ephocs = 200
-        for epoch in range(ephocs):
-            epoch_loss = 0
+        try :
+            ephocs = 20
+            for epoch in range(ephocs):
+                epoch_loss = 0
+                i = 0
+                while i < len(train_files):
+                    train_images = getImage( train_files[i:i+BATCH_SIZE] ) 
+                    _, l = sess.run([optimizer, loss], feed_dict={input_placeholder: train_images, output_placeholder: train_labels[i:i+BATCH_SIZE]} )
+                    epoch_loss += l
+                    print(i)
+                    i+=BATCH_SIZE
+                print("Epoch",epoch+1,"completed with a cost of", epoch_loss)
+        except KeyboardInterrupt:
+            print("\nKeyboard Interrupt")
+        except Exception as e:
+            print("\nUnknown Exception")
+            print(str(e))
+        finally:
+            # Predict Test Data
+            print("\nPredicting Test Data ...")
+            test_probabilities = np.array([])
             i = 0
-            while i < len(train_files):
-                train_images = getImage( train_files[i:i+BATCH_SIZE] ) 
-                _, l = sess.run([optimizer, loss], feed_dict={input_placeholder: train_images, output_placeholder: train_labels[i:i+BATCH_SIZE]} )
-                epoch_loss += l 
+            while i < len(test_files):
+                test_images = getImage(test_files[i:i+BATCH_SIZE] ) 
+                partial_labels = test_prediction.eval(feed_dict={input_placeholder : test_images})
+                for j in range(len(partial_labels)):
+                    test_probabilities = np.append(test_probabilities, [i+j+1, (partial_labels[j][0]+partial_labels[j][1])/2+0.5 ])
                 print(i)
                 i+=BATCH_SIZE
-            print("Epoch",epoch+1,"completed with a cost of", epoch_loss)
 
-
-        # Predict Test Data
-        test_labels = np.array([])
-        i = 0
-        while i < len(test_files):
-            test_images = getImage(test_files[i:i+BATCH_SIZE] ) 
-            partial_labels = test_prediction.eval(feed_dict={input_placeholder : test_images})
-            partial_labels = [ [i+k+1, partial_labels[k]] for k in range(len(partial_labels)) ]
-            test_labels = np.append(test_labels, partial_labels)
-            print(i)
-            i+=BATCH_SIZE
-
-        # Saving Prediction in CSV    
-        test_labels = np.reshape(test_labels, (-1, 2))
-        np.savetxt("/home/dollarakshay/Documents/Machine Learning Data/Dogs vs Cats/prediction.csv", 
-            test_labels, delimiter=',', header='id,label', fmt='%.0f', newline='\n', comments='')
+            # Saving Prediction in CSV    
+            test_probabilities = np.reshape(test_probabilities, (-1, 2))
+            np.savetxt("/home/dollarakshay/Documents/Machine Learning Data/Dogs vs Cats/prediction.csv", 
+                test_probabilities, delimiter=',', header='id,label', fmt='%.0f', newline='\n', comments='')
 
         
 
-SIZE = 112
+SIZE = 128
 BATCH_SIZE = 64
 input_features = [None, SIZE, SIZE, 3]
 output_features = 2
@@ -138,7 +145,7 @@ TRAIN_DIR = '/home/dollarakshay/Documents/Machine Learning Data/Dogs vs Cats/tra
 train_cats = sorted(glob.glob(os.path.join(TRAIN_DIR, 'cat*.jpg')))
 train_dogs = sorted(glob.glob(os.path.join(TRAIN_DIR, 'dog*.jpg')))
 train_files = train_cats + train_dogs
-print(len(train_files))
+random.shuffle(train_files)
 train_labels = [([0, 1] if 'dog' in file else [1, 0]) for file in train_files]
 
 

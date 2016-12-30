@@ -46,7 +46,8 @@ class NeuralNet :
         output = input
         for i in range(len(self.nodeCount)-1):
             output = np.reshape( np.matmul(output, self.weights[i]) + self.biases[i], (self.nodeCount[i+1]))
-        return output
+            output = np.maximum(output, 0)
+        return np.subtract(np.multiply(sigmoid(output), 2), 1)
 #
 #
 class Population :
@@ -199,7 +200,7 @@ def loadWeights():
 #
 def saveWeights(best):
     
-    f = open('Artificial Intelligence/'+GAME+"/"+GAME+".txt", 'w')
+    f = open('Artificial Intelligence/'+GAME+"/"+GAME+".2txt", 'w')
     print("Node Count : ", file=f)
     for i in range(len(best.nodeCount)):
         print("%d " % best.nodeCount[i], file=f, end="");
@@ -227,9 +228,9 @@ GAME = 'BipedalWalker-v2'
 env = gym.make(GAME)
 
 MAX_STEPS = env.spec.timestep_limit
-MAX_GENERATIONS = 2000
-POPULATION_COUNT = 100
-MUTATION_RATE = 0.01
+MAX_GENERATIONS = 500
+POPULATION_COUNT = 50
+MUTATION_RATE = 0.001
 
 in_dimen = env.observation_space.shape[0]
 out_dimen = env.action_space.shape[0]
