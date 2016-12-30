@@ -93,11 +93,12 @@ def train_neural_network():
 
     with tf.Session() as sess :
         sess.run(tf.global_variables_initializer())
+        
 
         # Train Neural Net
         print("\nTraining Neural Net ... ")
         try :
-            ephocs = 20
+            ephocs = 200
             for epoch in range(ephocs):
                 epoch_loss = 0
                 i = 0
