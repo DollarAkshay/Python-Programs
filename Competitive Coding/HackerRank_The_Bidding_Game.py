@@ -134,7 +134,7 @@ def getBetLimit(state, player):
 
 #
 # Main
-EPISODES = 1000
+EPISODES = 10000
 EPSILON = 0.1
 DISCOUNT = 0.99
 
@@ -151,15 +151,17 @@ output_prediction1 = neural_network1()
 output_action1 = tf.argmax(output_prediction1, 1)[0]
 output_target1 = tf.placeholder('float', [1, op_features])
 loss1 = tf.reduce_sum(tf.square(output_target1 - output_prediction1))
-trainer1 = tf.train.AdamOptimizer(learning_rate=0.01)
+trainer1 = tf.train.GradientDescentOptimizer(learning_rate=0.1)
 optimizer1 = trainer1.minimize(loss1)
 
 output_prediction2 = neural_network2()
 output_action2 = tf.argmax(output_prediction2, 1)[0]
 output_target2 = tf.placeholder('float', [1, op_features])
 loss2 = tf.reduce_sum(tf.square(output_target2 - output_prediction2))
-trainer2 = tf.train.AdamOptimizer(learning_rate=0.01)
+trainer2 = tf.train.GradientDescentOptimizer(learning_rate=0.1)
 optimizer2 = trainer2.minimize(loss2)
+
+np.set_printoptions(precision=3, suppress=True, linewidth=120)
 
 with tf.Session() as sess :
     sess.run(tf.global_variables_initializer())
@@ -170,25 +172,30 @@ with tf.Session() as sess :
         totalLoss1 = 0
         totalLoss2 = 0
         for turn in range(1000):
-            print("Turn :", turn)
+            #print("Turn :", turn)
             curState = game.getState()
-            for i in range(11):
-                print("#", end=" ") if i == game.pos else print("_", end=" ")    
-            print("")
+            
             
             betlimit1 = getBetLimit(curState, 1)
             action1, actualQ1 = sess.run([output_action1, output_prediction1], feed_dict={ip_placeholder: curState, limit_placeholder: betlimit1 })
-            if np.random.rand(1) < EPSILON and game.player1Cash > 0:
-                print("Player 1 took random action")
+            if np.random.rand(1) < 0.2 and game.player1Cash > 0:
+                #print("Player 1 took random action")
                 action1 = random.randint(1, game.player1Cash)
-            print("Player 1 bet "+str(action1)+"/"+str(game.player1Cash))
+            
 
             betlimit2 = getBetLimit(curState, 2)
             action2, actualQ2 = sess.run([output_action2, output_prediction2], feed_dict={ip_placeholder: curState, limit_placeholder: betlimit2 })
             if np.random.rand(1) < EPSILON  and game.player2Cash > 0: 
-                print("Player 2 took random action")
+                #print("Player 2 took random action")
                 action2 = random.randint(1, game.player2Cash)
-            print("Player 2 bet "+str(action2)+"/"+str(game.player2Cash))
+            
+
+            if episode%1000==0:
+                for i in range(11):
+                    print("#", end=" ") if i == game.pos else print("_", end=" ")    
+                print("")
+                print("Player 1 bet "+str(action1)+"/"+str(game.player1Cash))
+                print("Player 2 bet "+str(action2)+"/"+str(game.player2Cash))
 
 
             prevState = curState
@@ -206,21 +213,31 @@ with tf.Session() as sess :
             betlimit2 = getBetLimit(prevState, 2)
 
             targetQ1 = actualQ1
+            if episode%1000==0:
+                print("TargetQ1 :")
+                print(targetQ1)
             targetQ1[0, action1] = rewards[0] + DISCOUNT*maxQ1CurState
+            if episode%1000==0:
+                print(targetQ1)
 
             targetQ2 = actualQ2
+            if episode%1000==0:
+                print("\nTargetQ2 :")
+                print(targetQ2)
             targetQ2[0, action2] = rewards[1] + DISCOUNT*maxQ2CurState
+            if episode%1000==0:
+                print(targetQ2)
 
             _, l1 = sess.run([optimizer1, loss1],feed_dict={ip_placeholder: prevState , output_target1: targetQ1, limit_placeholder: betlimit1})
             totalLoss1+=l1
             _, l2 = sess.run([optimizer2, loss2],feed_dict={ip_placeholder: prevState , output_target2: targetQ2, limit_placeholder: betlimit2})
             totalLoss2+=l2
 
-            if True:
+            if episode%1000==0:
                 input()
 
             if done:
-                if max(rewards)==100:
+                if max(rewards)==100 and episode%1000==0:
                     print(" ~~~ PLAYER", np.argmax(rewards)+1,"WINS ~~~")
                 break
         
