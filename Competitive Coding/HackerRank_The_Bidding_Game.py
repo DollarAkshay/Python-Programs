@@ -61,7 +61,7 @@ class GameState():
 # Player 1 Neural Network
 def neural_network1():
     
-    nodeCount = [150, 100]
+    nodeCount = [10, 10]
 
     weights = {
         'hidden1': tf.Variable( tf.random_normal( [ip_features, nodeCount[0]] )) ,
@@ -90,7 +90,7 @@ def neural_network1():
 # Player 2 Neural Network
 def neural_network2():
     
-    nodeCount = [175, 80]
+    nodeCount = [180, 120]
 
     weights = {
         'hidden1': tf.Variable( tf.random_normal( [ip_features, nodeCount[0]] )) ,
@@ -178,7 +178,7 @@ with tf.Session() as sess :
             
             betlimit1 = getBetLimit(curState, 1)
             action1, actualQ1 = sess.run([output_action1, output_prediction1], feed_dict={ip_placeholder: curState, limit_placeholder: betlimit1 })
-            if np.random.rand(1) < 0.2 and game.player1Cash > 0:
+            if np.random.rand(1) < 1 and game.player1Cash > 0:
                 #print("Player 1 took random action")
                 action1 = random.randint(1, game.player1Cash)
             
@@ -213,20 +213,10 @@ with tf.Session() as sess :
             betlimit2 = getBetLimit(prevState, 2)
 
             targetQ1 = actualQ1
-            if episode%1000==0:
-                print("TargetQ1 :")
-                print(targetQ1)
             targetQ1[0, action1] = rewards[0] + DISCOUNT*maxQ1CurState
-            if episode%1000==0:
-                print(targetQ1)
 
             targetQ2 = actualQ2
-            if episode%1000==0:
-                print("\nTargetQ2 :")
-                print(targetQ2)
             targetQ2[0, action2] = rewards[1] + DISCOUNT*maxQ2CurState
-            if episode%1000==0:
-                print(targetQ2)
 
             _, l1 = sess.run([optimizer1, loss1],feed_dict={ip_placeholder: prevState , output_target1: targetQ1, limit_placeholder: betlimit1})
             totalLoss1+=l1
@@ -239,9 +229,12 @@ with tf.Session() as sess :
             if done:
                 if max(rewards)==100 and episode%1000==0:
                     print(" ~~~ PLAYER", np.argmax(rewards)+1,"WINS ~~~")
+                    
                 break
         
         print("Total Loss for Player 1 :", totalLoss1)
         print("Total Loss for Player 2 :", totalLoss2)
+        if episode%1000==0:
+            input()
         EPSILON-=0.1/100
 
