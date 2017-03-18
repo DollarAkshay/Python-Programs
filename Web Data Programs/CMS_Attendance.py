@@ -6,32 +6,32 @@ import time
 import math
 
 
+def checkNeedsUpdate(mysql_time):
+
+    last_update_time = mysql_time
+
+    min_update_time = ""
+    if int(time.strftime("%H")) > 18:
+        min_update_time = datetime.datetime.combine(datetime.date.today(), datetime.time(18))
+    else :
+        min_update_time = datetime.datetime.combine(datetime.date.today() - datetime.timedelta(days=1), datetime.time(18))
+
+    return last_update_time < min_update_time
+
+
 file = open('C:\\Users\Akshay L Aradhya\\Documents\\Important Documents\\server_credentials.txt', 'r')
 
-HOST = ""
+HOST = file.readline().rstrip('\n')
 PORT = 3306
-USER = ""
-PASS = ""
-DB = "dolla321_bnmit_cms"
-
-encHOST = file.readline().rstrip('\n');
-encUSER = file.readline().rstrip('\n');
-encPASS = file.readline().rstrip('\n');
-file.close()
-
-for c in encHOST:
-    HOST += chr(ord(c)-1)
-
-for c in encUSER:
-    USER += chr(ord(c)-1)
-
-for c in encPASS:
-    PASS += chr(ord(c)-1)
+USER = file.readline().rstrip('\n')
+PASS = file.readline().rstrip('\n')
+DB = "dolla321_bnmit_cms_2017_1"
 
 
-opt = webdriver.ChromeOptions()
-opt.add_argument("--user-data-dir=C:\\Users\\Akshay L Aradhya\\AppData\\Local\\Google\\Chrome\\User Data\\Testing")
-driver = webdriver.Chrome(chrome_options=opt)
+driverPath = "Web Data Programs/driver/chromedriver_2.24.exe"
+options = webdriver.ChromeOptions()
+options.add_argument("--user-data-dir=C:\\Users\\Akshay L Aradhya\\AppData\\Local\\Google\\Chrome\\User Data\\Testing")
+driver = webdriver.Chrome(chrome_options=options, executable_path=driverPath)
 driver.delete_all_cookies()
 driver.implicitly_wait(5)
 driver.get('http://bnmit.pupilpod.in/pupilpod-home')
@@ -51,7 +51,7 @@ try:
     try :
         print("Updating script last run time")
         today = str(datetime.date.today())
-        curtime = datetime.datetime.now().strftime('%H:%M:%S')
+        curtime = str(datetime.datetime.now().strftime('%H:%M:%S'))
         sql= "INSERT INTO `Script Schedule` VALUES ('"+today+"', '"+curtime+"')  ON DUPLICATE KEY UPDATE `Last Run`='"+curtime+"' "
         cursor.execute(sql)
     except Exception as e:
@@ -67,6 +67,14 @@ try:
         usn = row[0]
         password = row[1]
         userInfo = row[2]
+        usn_prefix = row[3]
+        lastupdate = row[4]
+        if usn_prefix=="X":
+            print("Cannot Login for "+usn)
+            continue
+        if checkNeedsUpdate(lastupdate)==False:
+            print("Already Updated "+usn+" today at "+str(lastupdate))
+            continue
 
         # Login to CMS
         print("\n\nLoging in for "+usn)
@@ -75,13 +83,21 @@ try:
         submit_input = driver.find_element_by_id("edit-submit")
         email_input.clear();
         pass_input.clear();
-        email_input.send_keys(usn)
-        pass_input.send_keys(password)
+        email_input.send_keys(usn_prefix+usn)
+        pass_input.send_keys(usn_prefix+password)
         submit_input.click()
 
-        try:
+        try :
             email_input = driver.find_element_by_id("edit-name")
             print("Invalid Login")
+
+            if usn_prefix == "F":
+                usn_prefix = "M";
+                cursor.execute("UPDATE Users SET USN_Prefix='"+usn_prefix+"' WHERE USN LIKE '"+usn+"'  ")
+            elif usn_prefix == "M":
+                usn_prefix = "X"
+                cursor.execute("UPDATE Users SET USN_Prefix='"+usn_prefix+"' WHERE USN LIKE '"+usn+"' ")
+                  
             continue
         except Exception as e:
             pass
@@ -109,7 +125,7 @@ try:
 
 
         #Go to attendance page
-        driver.get('http://bnmit.pupilpod.in/tnet?dj12aWV3X2F0dGVuZGFuY2VfcHJvZ3JhbV90YWJzJmZlYXR1cmVfaWQ9YWNhZGVtaWNz')
+        driver.get('http://bnmit.pupilpod.in/tnet?dj12aWV3X2F0dGVuZGFuY2VfcHJvZ3JhbV90YWJzJmZlYXR1cmVfaWQ9YWNhZGVtaWNz#ui-tabs-2')
 
         #Retrive Attendance
         print("Updating attendance for "+name);
@@ -122,8 +138,16 @@ try:
                 subject = table_cells[0].text
                 today = str(datetime.date.today())
                 total = table_cells[1].text
+                if total=='':
+                    total="0"
                 present = table_cells[2].text
-                percentage = table_cells[4].text[:5]
+                if present=='':
+                    present="0"
+                if total=="0":
+                    percentage = "0"
+                else:
+                    percentage = str(100*int(present)/int(total));
+                
                 sql= "INSERT INTO `Attendance` VALUES ('"+usn+"', '"+subject+"', '"+today+"', "+total+", "+present+", "+percentage+")  ON DUPLICATE KEY UPDATE Total="+total+", present="+present+", percentage="+percentage+" "
                 cursor.execute(sql)
                 print("Updated "+subject)

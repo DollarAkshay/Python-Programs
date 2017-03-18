@@ -28,7 +28,6 @@ start = Point()
 end = Point()
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-vout = cv2.VideoWriter('maze2.avi', fourcc, 20.0, (1024, 768))
 mX, mY = [0,0]
 dir4 = [Point( 0,-1),Point(-1, 0), Point( 0, 0), Point( 1, 0),Point( 0, 1)]
 dir8 = [Point(-1,-1), Point( 0,-1), Point( 1,-1),
@@ -100,6 +99,7 @@ def mouse_event(event,x,y,flags,param):
     if event == cv2.EVENT_RBUTTONUP and scale>=1:
         scale-=1
 
+
     if event == cv2.EVENT_MOUSEWHEEL:
         pX, pY = [ int(mX/scale), int(mY/scale)]
         if p==0:
@@ -115,17 +115,15 @@ def mouse_event(event,x,y,flags,param):
 
 def disp():
 
-    global scale, img, w, h, vout
+    global scale, img, w, h
     cv2.imshow('image', img)
     cv2.setMouseCallback('image', mouse_event)
     while 1:
-        vout.write(img)
-        resi = cv2.resize(img,(scale*w, scale*h), interpolation=cv2.INTER_NEAREST)
-        cv2.imshow('image', resi)
+        cv2.imshow('image', img)
         cv2.waitKey(1)
 
 
-img = cv2.imread('OpenCV/Images/hardest_maze.png', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('OpenCV/Images/crack.gif', cv2.IMREAD_GRAYSCALE)
 _, img = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY)
 img = cv2.cvtColor(img , cv2.COLOR_GRAY2BGR)
 h, w = img.shape[:2]
