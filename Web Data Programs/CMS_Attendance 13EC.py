@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import MySQLdb as db
+import os
 import datetime
 import time
 import math
@@ -19,7 +20,15 @@ def checkNeedsUpdate(mysql_time):
     return last_update_time < min_update_time
 
 
-file = open('C:\\Users\Akshay L Aradhya\\Documents\\Important Documents\\server_credentials.txt', 'r')
+if os.name == "nt":
+    driverPath = "Web Data Programs/driver/chromedriver_2.24.exe"
+    dataPath = "C:\\Users\\Akshay L Aradhya\\AppData\\Local\\Google\\Chrome\\User Data\\Testing 13EC"
+    file = open('C:\\Users\Akshay L Aradhya\\Documents\\Important Documents\\server_credentials.txt', 'r')
+else :
+    driverPath = "Web Data Programs/driver/chromedriver"
+    dataPath = "Data/Testing 13EC"
+    file = open('/home/dollarakshay/Documents/Important Documents/server_credentials.txt', 'r')
+
 
 HOST = file.readline().rstrip('\n')
 PORT = 3306
@@ -28,9 +37,8 @@ PASS = file.readline().rstrip('\n')
 DB = "dolla321_bnmit_cms_2017_1"
 
 
-driverPath = "Web Data Programs/driver/chromedriver_2.24.exe"
 options = webdriver.ChromeOptions()
-options.add_argument("--user-data-dir=C:\\Users\\Akshay L Aradhya\\AppData\\Local\\Google\\Chrome\\User Data\\Testing 13EC")
+options.add_argument("--user-data-dir="+dataPath)
 driver = webdriver.Chrome(chrome_options=options, executable_path=driverPath)
 driver.delete_all_cookies()
 driver.implicitly_wait(5)
