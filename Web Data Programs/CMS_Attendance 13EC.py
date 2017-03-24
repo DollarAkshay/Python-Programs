@@ -7,6 +7,12 @@ import time
 import math
 
 
+def getAttendanceDate():
+    if int(time.strftime("%H")) < 9:
+        return (datetime.datetime.now() - datetime.timedelta(1)).strftime('%Y-%m-%d')
+    else :
+        return  (datetime.datetime.now()).strftime('%Y-%m-%d')
+
 def checkNeedsUpdate(mysql_time):
 
     last_update_time = mysql_time
@@ -147,7 +153,7 @@ try:
                     table_cells = row.find_elements_by_tag_name("td")
                     try :
                         subject = table_cells[0].text
-                        today = str(datetime.date.today())
+                        attendance_date = getAttendanceDate()
                         total = table_cells[1].text
                         if total=='':
                             total="0"
@@ -159,7 +165,7 @@ try:
                         else:
                             percentage = str(100*int(present)/int(total));
                 
-                        sql= "INSERT INTO `Attendance` VALUES ('"+usn+"', '"+subject+"', '"+today+"', "+total+", "+present+", "+percentage+")  ON DUPLICATE KEY UPDATE Total="+total+", present="+present+", percentage="+percentage+" "
+                        sql= "INSERT INTO `Attendance` VALUES ('"+usn+"', '"+subject+"', '"+attendance_date+"', "+total+", "+present+", "+percentage+")  ON DUPLICATE KEY UPDATE Total="+total+", present="+present+", percentage="+percentage+" "
                         cursor.execute(sql)
                         print("Updated "+subject)
                     except Exception as e:

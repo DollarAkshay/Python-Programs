@@ -10,7 +10,7 @@ HOST = file.readline().rstrip('\n')
 PORT = 3306
 USER = file.readline().rstrip('\n')
 PASS = file.readline().rstrip('\n')
-DB = "dolla321_bnmit_cms_2017_1"
+DB = "swiftcode"
 
 
 try:
@@ -20,34 +20,23 @@ try:
 
     #Create CS Users
     for i in range(1, 131):
-        usn = '1BG13CS'+(str(i).zfill(3))
+        usn = '1BG14CS'+(str(i).zfill(3))
         password = usn
         cursor.execute("INSERT IGNORE INTO `Users` (`USN`, `Password`) VALUES ( '"+usn+"', '"+password+"' ) ")
 
     for i in range(400, 430):
-        usn = '1BG13CS'+(str(i).zfill(3))
-        password = usn
-        cursor.execute("INSERT IGNORE INTO `Users` (`USN`, `Password`) VALUES ( '"+usn+"', '"+password+"' ) ")
-
-    #Create EC Users
-    for i in range(1, 131):
-        usn = '1BG13EC'+(str(i).zfill(3))
-        password = usn
-        cursor.execute("INSERT IGNORE INTO `Users` (`USN`, `Password`) VALUES ( '"+usn+"', '"+password+"' ) ")
-
-    for i in range(400, 430):
-        usn = '1BG13EC'+(str(i).zfill(3))
+        usn = '1BG14CS'+(str(i).zfill(3))
         password = usn
         cursor.execute("INSERT IGNORE INTO `Users` (`USN`, `Password`) VALUES ( '"+usn+"', '"+password+"' ) ")
 
     #Create IS Users
     for i in range(1, 131):
-        usn = '1BG13IS'+(str(i).zfill(3))
+        usn = '1BG14IS'+(str(i).zfill(3))
         password = usn
         cursor.execute("INSERT IGNORE INTO `Users` (`USN`, `Password`) VALUES ( '"+usn+"', '"+password+"' ) ")
 
     for i in range(400, 430):
-        usn = '1BG13IS'+(str(i).zfill(3))
+        usn = '1BG14IS'+(str(i).zfill(3))
         password = usn
         cursor.execute("INSERT IGNORE INTO `Users` (`USN`, `Password`) VALUES ( '"+usn+"', '"+password+"' ) ")
 
