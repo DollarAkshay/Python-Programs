@@ -1,6 +1,8 @@
 ﻿import cv2
 import numpy as np
 import matplotlib as plt
+import sys
+
 
 img1 = cv2.imread('OpenCV/Images/cup.png')
 img2 = cv2.imread('OpenCV/Images/cloth.png')
