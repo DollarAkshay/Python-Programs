@@ -11,6 +11,9 @@ ehthumbs.db
 /Debug
 /@Visual Studio Files
 
+#Visual Studio Code Folder
+/.vscode
+
 # Folder config file
 Desktop.ini
 

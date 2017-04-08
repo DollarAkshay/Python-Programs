@@ -15,7 +15,7 @@ def getAttendanceDate():
 
 def checkNeedsUpdate(mysql_time):
 
-    last_update_time = datetime.datetime.strptime(str(mysql_time), '%Y-%m-%d %H:%M:%S')
+    last_update_time = mysql_time
 
     min_update_time = ""
     if int(time.strftime("%H")) > 18:
