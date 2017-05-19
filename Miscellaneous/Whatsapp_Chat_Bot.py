@@ -8,7 +8,7 @@ opt.add_argument("--user-data-dir=C:\\Users\\Akshay L Aradhya\\AppData\\Local\\G
 driver = webdriver.Chrome(chrome_options=opt)
 driver.get('https://web.whatsapp.com/')
 
-input();
+input()
 
 
 while True:
