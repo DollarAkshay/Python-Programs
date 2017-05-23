@@ -1,7 +1,3 @@
-
-
-
-
 f = open('Miscellaneous/Data/Graduation_Unordered.txt')
 nameList = []
 for line in f:
