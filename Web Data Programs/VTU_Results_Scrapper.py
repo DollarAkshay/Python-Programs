@@ -21,8 +21,8 @@ driver.implicitly_wait(2)
 f = open("Web Data Programs/data/results.txt", 'r')
 
 try:
-    for i in range(0, 0):
-        usn = "1BG14CS{:03}".format(i)
+    for i in range(0, 125):
+        usn = "1BG13CS{:03}".format(i)
         print(usn)
         try:
             f.write(usn+"\n")
