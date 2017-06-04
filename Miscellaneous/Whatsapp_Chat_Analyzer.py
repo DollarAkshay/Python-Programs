@@ -59,11 +59,11 @@ message_count = [[k, message_count[k]] for k in sorted(message_count, key=messag
 print(message_count)
 
 
-labels = [i[0] for i in message_count[:20]]
-sizes = [i[1]**2 for i in message_count[:20]]
+labels = [i[0] for i in message_count[:9]]
+sizes = [i[1]**2 for i in message_count[:9]]
 total = sum([i[1]**2 for i in message_count])
 labels.append('Others')
-sizes.append( sum([i[1]**2 for i in message_count[20:]]) )
+sizes.append( sum([i[1]**2 for i in message_count[9:]]) )
 
 fig1, ax1 = plt.subplots()
 ax1.pie(sizes, labels=labels, autopct=make_autopct(sizes),
