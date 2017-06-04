@@ -31,7 +31,7 @@ curMessage = None
 count = 0
 for line in lines:
 
-    match = re.match( r'^[1]*[0-9]\/[1-3]*[0-9]\/[1][6-7], [1]*[0-9]:[0-5][0-9] [AP]M - ' , line)
+    match = re.match( r'^[1]*[0-9]\/[1-3]*[0-9]\/[1][6-7]' , line)
     if match != None:
         if curMessage!=None:
             messages.append(curMessage)
