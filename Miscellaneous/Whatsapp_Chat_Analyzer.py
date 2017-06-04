@@ -50,13 +50,13 @@ for line in lines:
 message_count = {}
 
 for msg in messages:
-    if msg.user in message_count:
+    if "<Media omitted>" in msg.message and msg.user in message_count:
         message_count[msg.user]+=1
-    else:
+    elif "<Media omitted>" in msg.message:
         message_count[msg.user] = 1
 
 message_count = [[k, message_count[k]] for k in sorted(message_count, key=message_count.get, reverse=True)]
-print(message_count)
+
 
 
 labels = [i[0] for i in message_count[:9]]
