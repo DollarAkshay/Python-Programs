@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 #
 #
 #
-
 class Message:
     messageCount = 0
     def __init__(self, date, user, message):
@@ -57,13 +56,14 @@ for msg in messages:
         message_count[msg.user] = 1
 
 message_count = [[k, message_count[k]] for k in sorted(message_count, key=message_count.get, reverse=True)]
+print(message_count)
 
 
-labels = [i[0] for i in message_count[:9]]
-sizes = [i[1]**2 for i in message_count[:9]]
+labels = [i[0] for i in message_count[:20]]
+sizes = [i[1]**2 for i in message_count[:20]]
 total = sum([i[1]**2 for i in message_count])
 labels.append('Others')
-sizes.append( sum([i[1]**2 for i in message_count[9:]]) )
+sizes.append( sum([i[1]**2 for i in message_count[20:]]) )
 
 fig1, ax1 = plt.subplots()
 ax1.pie(sizes, labels=labels, autopct=make_autopct(sizes),
