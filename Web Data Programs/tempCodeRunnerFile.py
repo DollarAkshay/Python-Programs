@@ -1,0 +1,1 @@
+%USERPROFILE%\\AppData\\Local\\Google\\Chrome\\User Data\\Automation Profile
