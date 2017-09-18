@@ -13,7 +13,7 @@ name_list = ["ABHINAV A BHOPARDIKAR", "AISHWARYA PADMANABHA", "AJAY G", "AKASH K
              "SHASHANK R", "SHASHANK.G.S", "SHASHIDHARA G", "SIDDESH ANGADI", "SUHAS G", "SUJAN K S",
              "SUPRITHA P", "TOUFEEQ ULLA KHAN", "VINODA RAJU G M", "AISHWARYA S", "CHITHRA R.M",
              "KAVANA N BHATT", "SMRITI PRABHA", "SREEVATS R RAVILLU", "SUPRIYA", "SWETHA.B.S",
-             "VANITHA R", "VISHALAKSHI R", "VISHWAL P K", "NIKHIL D", "SACHIN.M", "SHRAAVYA K"]
+             "VANITHA R", "VISHALAKSHI R", "VISHWAL P K", "NIKHIL D", "SACHIN.M", "SHRAAVYA K", "RUCHIKA SINGHI"]
 
 for name in name_list:
     image = cv2.imread("OpenCV/images/SwiftCode Certificate.png")
