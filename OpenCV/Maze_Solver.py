@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import threading
 import colorsys
 
@@ -14,14 +13,8 @@ class Point(object):
     def __add__(self, other):
         return Point(self.x + other.x, self.y + other.y)
 
-    def __mul__(self, k):
-        return Point(self.x * k, self.y * k)
-
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
-
-    def __str__(self):
-        return "({0}, {1})".format(self.x, self.y)
 
 
 rw = 2
@@ -30,12 +23,7 @@ scale = 1
 start = Point()
 end = Point()
 
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-mX, mY = [0, 0]
 dir4 = [Point(0, -1), Point(-1, 0), Point(0, 0), Point(1, 0), Point(0, 1)]
-dir8 = [Point(-1, -1), Point(0, -1), Point(1, -1),
-        Point(-1, 0), Point(0, 0), Point(1, 0),
-        Point(-1, 1), Point(0, 1), Point(1, 1)]
 
 
 def BFS_Search(s, e):
@@ -43,9 +31,9 @@ def BFS_Search(s, e):
     print("Starting BFS Search")
 
     global img, h, w
-    const = h * w // 42
+    const = 2000
+
     found = False
-    visited_color = [25, 200, 255]
     path_color = [255, 255, 255]
 
     q = []
@@ -57,18 +45,20 @@ def BFS_Search(s, e):
 
     while len(q) > 0:
         p = q.pop(0)
+
         for d in dir4:
             cell = p + d
-            if (cell.y >= 0 and cell.y < h and
-                cell.x >= 0 and cell.x < w and
-                v[cell.y][cell.x] == 0 and
+            if (cell.y >= 0 and cell.y < h and cell.x >= 0 and cell.x < w and v[cell.y][cell.x] == 0 and
                     (img[cell.y][cell.x][0] != 0 or img[cell.y][cell.x][1] != 0 or img[cell.y][cell.x][2] != 0)):
+
                 q.append(cell)
                 v[cell.y][cell.x] = v[p.y][p.x] + 1
+
                 if img[cell.y][cell.x][0] == 255:
                     img[cell.y][cell.x] = list(reversed(
                         [i * 255 for i in colorsys.hsv_to_rgb(v[cell.y][cell.x] / const, 1, 1)]))
                 parent[cell.y][cell.x] = p
+
                 if cell == e:
                     found = True
                     del q[:]
@@ -92,18 +82,14 @@ def BFS_Search(s, e):
     print("Completed BFS Search")
 
 
-def mouse_event(event, x, y, flags, param):
+def mouse_event(event, pX, pY, flags, param):
 
-    global start, end, scale, img, p, mX, mY
-
-    if event == cv2.EVENT_MOUSEMOVE:
-        mX, mY = x, y
+    global start, end, img, p
 
     if event == cv2.EVENT_LBUTTONUP:
-        pX, pY = [int(mX / scale), int(mY / scale)]
         if p == 0:
-            cv2.rectangle(img, (pX - rw, pY - rw),
-                          (pX + rw, pY + rw), (0, 0, 255), -1)
+            cv2.rectangle(img, (pX - rw, pY - rw), (pX + rw, pY + rw),
+                          (0, 0, 255), -1)
             start = Point(pX, pY)
             print("Start =", start)
             p += 1
@@ -116,8 +102,7 @@ def mouse_event(event, x, y, flags, param):
 
 
 def disp():
-
-    global scale, img, w, h
+    global img
     cv2.imshow('image', img)
     cv2.setMouseCallback('image', mouse_event)
     while 1:
@@ -125,11 +110,12 @@ def disp():
         cv2.waitKey(1)
 
 
-img = cv2.imread('OpenCV/Images/hardest_maze.png', cv2.IMREAD_GRAYSCALE)
+img = cv2.imread('OpenCV/Images/cloth_720.png', cv2.IMREAD_GRAYSCALE)
 _, img = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY)
 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 h, w = img.shape[:2]
 print("Select start and End points by clicking")
+
 
 t = threading.Thread(target=disp, args=())
 t.daemon = True
@@ -140,5 +126,5 @@ while p < 2:
 
 BFS_Search(start, end)
 print("Press any key to continue...")
-cv2.waitKey(1000)
+cv2.waitKey(0)
 cv2.destroyAllWindows()
