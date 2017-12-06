@@ -57,6 +57,8 @@ db = getMongoDBConnection()
 session_key = getSessionKey()
 timestamp = str(int(time.time()))
 
+db.employee.drop()
+
 emp_list = fetchEmployeeList()
 
 
