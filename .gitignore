@@ -10,6 +10,7 @@ ehthumbs.db
 *.user
 /Debug
 /@Visual Studio Files
+/AppData
 
 #Visual Studio Code Folder
 /.vscode
@@ -28,4 +29,5 @@ Desktop.ini
 # Windows shortcuts
 *.lnk
 
-
+*.log
+*.ini
