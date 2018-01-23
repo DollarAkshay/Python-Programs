@@ -53,7 +53,7 @@ def getUserListForChannel(channelID):
     req.add_header('Content-Type', 'application/json')
     response = urllib.request.urlopen(req)
     data = response.read().decode("utf-8")
-    API_CALL_COUNT+=1
+    API_CALL_COUNT += 1
 
     return sorted([chUser['User']['Id'] for chUser in json.loads(data)])
 
@@ -76,7 +76,7 @@ def addClient(clientLegacyID, clientName):
         req.add_header('Content-Type', 'application/json')
         response = urllib.request.urlopen(req)
         data = response.read().decode("utf-8")
-        API_CALL_COUNT+=1
+        API_CALL_COUNT += 1
         print("Creating Client '{}' with id {}".format(clientName, clientLegacyID))
 
 
@@ -104,7 +104,7 @@ def createProgram(programLegacyID, programName, clientLegacyID, channelName):
         req.add_header('Content-Type', 'application/json')
         response = urllib.request.urlopen(req)
         data = response.read().decode("utf-8")
-        API_CALL_COUNT+=1
+        API_CALL_COUNT += 1
         print("Creating Program '{}' with id {} for Client {}".format(programName, programLegacyID, clientLegacyID))
 
 
@@ -129,7 +129,7 @@ def addProgramUser(userLegacyID, username, programLegacyID, userRoleID):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Creating User '{}' with id {} for program {}".format(username, userLegacyID, programLegacyID))
         except Exception as e:
             print(str(e))
@@ -155,7 +155,7 @@ def createBroadcastMessage(channelID, text, channelUsersList):
         req.add_header('Content-Type', 'application/json')
         response = urllib.request.urlopen(req)
         data = response.read().decode("utf-8")
-        API_CALL_COUNT+=1
+        API_CALL_COUNT += 1
         print("Sending BroadcastMessage '{}' on channel ID {} all users".format(text, channelID))
 
 
@@ -177,7 +177,7 @@ def createAnswerBank(channelID, answerBankText):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Creating Answer Bank with text '{}'for Channel ID {}".format(answerBankText, channelID))
         except Exception as e:
             print(str(e))
@@ -201,7 +201,7 @@ def createCategory(programID, categoryName):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Creating Category with name '{}'for Program ID {}".format(categoryName, programID))
         except Exception as e:
             print(str(e))
@@ -224,7 +224,7 @@ def createChannelConversation(channelID, topic):
         req.add_header('Content-Type', 'application/json')
         response = urllib.request.urlopen(req)
         data = response.read().decode("utf-8")
-        API_CALL_COUNT+=1
+        API_CALL_COUNT += 1
         print("Creating Channel Conversation with Topic '{}' for ClientID {}".format(topic, channelID))
 
 
@@ -246,7 +246,7 @@ def joinChannelConversation(channelConversationID, userID):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Joining Channel Conversation ID '{}' for User ID {}".format(channelConversationID, userID))
         except Exception as e:
             print(str(e))
@@ -264,7 +264,7 @@ def getUsersInChannelConversation(channelConvoID):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Getting users in Channel Conversation ID {}".format(channelConvoID))
             return [user['UserId'] for user in json.loads(data)]
         except Exception as e:
@@ -288,7 +288,7 @@ def sendChannelMessage(convoID, userID, messageText):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             # print("Sending Channel Convo Message '{}' on Channel Convo ID {} from User ID {}".format(messageText, convoID, userID))
         except Exception as e:
             print(str(e))
@@ -311,7 +311,7 @@ def createChatQueue(channelID, topic, userID):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Creating Chat Queue '{}' with ID {} from User ID {}".format(topic, channelID, userID))
         except Exception as e:
             print(str(e))
@@ -334,7 +334,7 @@ def acceptChatQueue(chatQueueID, userID):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Accepting Chat Queue ID '{}' from User ID {}".format(chatQueueID, userID))
         except Exception as e:
             print(str(e))
@@ -357,7 +357,7 @@ def sendChatMessage(convoID, userID, messageText):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             # print("Sending Chat Message '{}' on Chat Convo ID {} from User ID {}".format(messageText, convoID, userID))
         except Exception as e:
             print(str(e))
@@ -378,7 +378,7 @@ def endChatConvo(convoID):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Ending Chat Convo ID {}".format(convoID))
         except Exception as e:
             print(str(e))
@@ -400,7 +400,7 @@ def sendChatConvoSurvey(convoID, rating):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Sending Survey for Chat Convo ID {} with rating {}".format(convoID, rating))
         except Exception as e:
             print(str(e))
@@ -426,7 +426,7 @@ def sendChatConvoCategory(convoID, categoryIDList):
             req.add_header('Content-Type', 'application/json')
             response = urllib.request.urlopen(req)
             data = response.read().decode("utf-8")
-            API_CALL_COUNT+=1
+            API_CALL_COUNT += 1
             print("Categorizing Chat Convo ID {} with category IDs {}".format(convoID, ','.join(categoryIDList)))
         except Exception as e:
             print(str(e))
@@ -438,17 +438,16 @@ def sendChatConvoCategory(convoID, categoryIDList):
 DEBUG_MODE = False
 API_CALL_COUNT = 0
 startTime = time.time()
-baseURL = 'http://192.168.10.83:85/api/'
+baseURL = 'http://192.168.10.77:85/api/'
 
-CLIENT_COUNT = 4
-PROGRAM_COUNT = 5
-
+CLIENT_COUNT = 3
+PROGRAMS_PER_CLIENT = 4
 
 PF_COUNT = 30
 CSP_COUNT = 70
 USER_PROGRAM_PROB = 0.1
 
-BROADCAST_MESSAGE_PER_CHANNEL = 25
+BROADCAST_MESSAGE_PER_CHANNEL = 15
 ANSWER_BANK_PER_CHANNEL = 25
 CATEGORY_PER_CHANNEL = 15
 
@@ -457,8 +456,7 @@ USER_CHANNEL_CONVO_PROB = 0.4
 MIN_CHANNEL_CONVO_MESSAGES = 10
 MAX_CHANNEL_CONVO_MESSAGES = 100
 
-
-CHAT_CONVO_PER_CHANNEL = 50
+CHAT_CONVO_PER_CHANNEL = 10
 MIN_CHAT_CONVO_MESSAGES = 5
 MAX_CHAT_CONVO_MESSAGES = 30
 
@@ -467,43 +465,43 @@ randomUsernameList = randomUserAPI(PF_COUNT + CSP_COUNT)
 
 for i in range(CLIENT_COUNT):
     addClient(i + 1, randomNoun(1, 2))
-    for j in range(PROGRAM_COUNT):
-        program_id = i * PROGRAM_COUNT + j + 1
+    for j in range(PROGRAMS_PER_CLIENT):
+        program_id = i * PROGRAMS_PER_CLIENT + j + 1
         createProgram(program_id, "Program " + str(program_id), i + 1, "Channel " + str(program_id))
 
 # Create PF
 for i in range(PF_COUNT):
-    for j in range(CLIENT_COUNT * PROGRAM_COUNT):
+    for j in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
         if random.random() <= USER_PROGRAM_PROB:
             addProgramUser(i + 1, randomUsernameList[i], j + 1, "2")
 
 # Create CSP
 for i in range(CSP_COUNT):
-    for j in range(CLIENT_COUNT * PROGRAM_COUNT):
+    for j in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
         if random.random() <= USER_PROGRAM_PROB:
             addProgramUser(PF_COUNT + i + 1, randomUsernameList[PF_COUNT + i], j + 1, "1")
 
 
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     userListByChannel[i + 1] = getUserListForChannel(i + 1)
 
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     for j in range(BROADCAST_MESSAGE_PER_CHANNEL):
         createBroadcastMessage(i + 1, randomSentence(8, 20), userListByChannel[i + 1])
 
 # Create Answer Banks for every Channel
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     for j in range(ANSWER_BANK_PER_CHANNEL):
         createAnswerBank(i + 1, randomSentence(6, 12))
 
 # Create Category for every program
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     for j in range(CATEGORY_PER_CHANNEL):
         createCategory(i + 1, randomSentence(1, 2))
 
 
 # Create Channel Conversations
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     for j in range(CHANNEL_CONVO_PER_CHANNEL):
         createChannelConversation(i + 1, "Channel Conversation " + str(j + 1))
         for userID in userListByChannel[i + 1]:
@@ -511,7 +509,7 @@ for i in range(CLIENT_COUNT * PROGRAM_COUNT):
                 joinChannelConversation(i * CHANNEL_CONVO_PER_CHANNEL + j + 1, userID)
 
 # Send Messages on Channel Conversation
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     for j in range(CHANNEL_CONVO_PER_CHANNEL):
         convo_id = i * CHANNEL_CONVO_PER_CHANNEL + j + 1
         userList = getUsersInChannelConversation(convo_id)
@@ -523,7 +521,7 @@ for i in range(CLIENT_COUNT * PROGRAM_COUNT):
 
 
 # One on One Chat Conversations
-for i in range(CLIENT_COUNT * PROGRAM_COUNT):
+for i in range(CLIENT_COUNT * PROGRAMS_PER_CLIENT):
     userList = userListByChannel[i + 1]
     pfList = []
     cspList = []
