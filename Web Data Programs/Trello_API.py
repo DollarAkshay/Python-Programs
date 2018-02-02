@@ -1,6 +1,7 @@
 import urllib.request
 import urllib.parse
 import json
+import csv
 
 
 def getAPIToken():
@@ -65,6 +66,22 @@ def createBoard(boardName):
     return -1
 
 
+def getListIdByName(listName, boardID):
+    try:
+        url = baseURL + '/boards/' + boardID + '/lists?key=' + key + "&token=" + token
+        req = urllib.request.Request(url, method="GET")
+        res = urllib.request.urlopen(req)
+        data = res.read().decode("utf-8")
+        board_list = json.loads(str(data))
+        for trello_list in board_list:
+            if trello_list['name'] == listName:
+                return trello_list['id']
+    except Exception as e:
+        print(str(e))
+
+    return -1
+
+
 def createList(boardId, listName):
     try:
         url = baseURL + '/lists'
@@ -96,23 +113,12 @@ def createCard(listID, name, description):
 key, token = getAPIToken()
 baseURL = "https://api.trello.com/1"
 
-deleteBoard("Arise Chat")
-boardId = createBoard("Arise Chat")
-print("BoardID :", boardId)
+boardId = "5a2fb23636c192438c8d0035"
+bug_list = getListIdByName("Bugs", boardId)
+print("List ID :", bug_list)
 
-currentListId = None
-with open("C:\\Users\\akshay.aradhya\\Documents\\Trello_Data.txt") as file:
-    for line in file:
-        line = line.rstrip('\n')
-        if line == '':
-            pass
-        elif line[0] == '\t':
-            desc = line[line.find('.') + 1:]
-            print("Card :", desc)
-            if currentListId is not None:
-                createCard(currentListId, desc, desc)
-            else:
-                print("Something is Wrong")
-        else:
-            print("List :", line)
-            currentListId = createList(boardId, line)
+
+with open('C:\\Users\\akshay.aradhya\\Documents\\completed.csv') as f:
+    d = csv.DictReader(f, skipinitialspace=True)
+    for row in d:
+        createCard(bug_list, row['Bug Description'], row['Solution Description'])
