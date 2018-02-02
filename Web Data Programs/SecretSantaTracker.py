@@ -8,7 +8,7 @@ def getMongoDBConnection():
         file = open(
             "C:\\Users\\akshay.aradhya\\Documents\\API Keys and Credentials\\mongo_db.txt", "r")
         HOST = file.readline().rstrip('\n')
-        PORT = 27017
+        PORT = file.readline().rstrip('\n')
         USER = file.readline().rstrip('\n')
         PASS = file.readline().rstrip('\n')
         DB = "betsol"
