@@ -11,6 +11,7 @@ lon = [8, 9]
 lon_range = (lon[1] - lon[0]) / res
 lat_range = (lat[1] - lat[0]) / res
 
+sum = 0
 sst_dictionary = {}
 for i in range(int(lon_range)):
     for j in range(int(lat_range)):
@@ -22,8 +23,12 @@ for i in range(int(lon_range)):
 
             # Key is of the form '1.4,7.8' i.e '<lon>,<lat>'
             key = str(lon_v) + "," + str(lat_v)
-            sst_dictionary[key] = random.randint(20, 30)
+            sst_value = random.randint(20, 30)
+            sum += sst_value
+            sst_dictionary[key] =
 
+
+average = sum / len(sst_dictionary)
 
 # Print the sst_dictionary
 print("SST Dictionary :")
@@ -44,7 +49,7 @@ for i in range(int(lon_range)):
         if key in sst_dictionary:
             result_dictionary[key] = sst_dictionary[key]
         else:
-            result_dictionary[key] = 0
+            result_dictionary[key] = average
 
 
 # Print the result_dictionary
