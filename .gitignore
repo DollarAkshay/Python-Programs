@@ -14,7 +14,7 @@ ehthumbs.db
 
 #Visual Studio Code Folder
 /.vscode
-/Miscellaneous/Data
+
 
 # Folder config file
 Desktop.ini
@@ -31,3 +31,7 @@ Desktop.ini
 
 *.log
 *.ini
+
+# Data Folders
+/Miscellaneous/Data
+/Jupyter Notebooks/Data
