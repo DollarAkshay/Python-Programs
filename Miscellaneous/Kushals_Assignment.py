@@ -22,8 +22,8 @@ def recursiveDP(x, y):
         return number_of_paths[y][x]
 
 
-m = 3
-n = 3
+m = 11
+n = 7
 
 # Create 2D Matrix of size (n+1)x(m+1)
 number_of_paths = [[0] * (m + 1) for i in range(n + 1)]
@@ -37,13 +37,18 @@ for i in range(n + 1):
         D[i][j] = calcD(j, i)
 
 
-# find mean(D[i][j] * number_of_paths[i][j])
-result = []
+# Convert to 1D flat list
+values = []
+freq = []
 for i in range(n + 1):
     for j in range(m + 1):
-        result.append(D[i][j] * number_of_paths[i][j])
+        values.append(D[i][j])
+        freq.append(number_of_paths[i][j])
 
+# Calculate mean and standard deviation from a frequency distribution (weights)
+# https://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
+mean = np.average(values, weights=freq)
+std_dev = np.sqrt(np.average((values - mean)**2, weights=freq))
 
-print("List : ", result)
-print("\nMean : ", np.mean(result))
-print("Standard Deviation : ", np.std(result))
+print("\nMean : ", mean)
+print("Standard Deviation : ", std_dev)
