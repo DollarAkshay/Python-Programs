@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def calcD(x, y):
     global n, m
     return max(x / m - y / n, y / n - x / m)
@@ -19,10 +22,10 @@ def recursiveDP(x, y):
         return number_of_paths[y][x]
 
 
-m = 11
-n = 7
+m = 3
+n = 3
 
-# Create a 2D Matrix of size (n+1)x(m+1)
+# Create 2D Matrix of size (n+1)x(m+1)
 number_of_paths = [[0] * (m + 1) for i in range(n + 1)]
 D = [[0] * (m + 1) for i in range(n + 1)]
 
@@ -33,26 +36,14 @@ for i in range(n + 1):
     for j in range(m + 1):
         D[i][j] = calcD(j, i)
 
-print("Number of Paths : ")
-# Print the Matrix
-for i in range(n + 1):
-    for j in range(m + 1):
-        print("{:6d} ".format(number_of_paths[i][j]), end="")
-    print("")
-
-print("\n\nD at x,y : ")
-# Print the D Matrix
-for i in range(n + 1):
-    for j in range(m + 1):
-        print("{:6f} ".format(D[i][j]), end="")
-    print("")
-
 
 # find mean(D[i][j] * number_of_paths[i][j])
-val_sum = 0
+result = []
 for i in range(n + 1):
     for j in range(m + 1):
-        val_sum += D[i][j] * number_of_paths[i][j]
+        result.append(D[i][j] * number_of_paths[i][j])
 
-print("\n\nMean of D : ")
-print(val_sum / ((m + 1) * (n + 1)))
+
+print("List : ", result)
+print("\nMean : ", np.mean(result))
+print("Standard Deviation : ", np.std(result))
