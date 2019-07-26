@@ -34,5 +34,5 @@ Desktop.ini
 *.ini
 
 # Data Folders
-/Miscellaneous/Data
-/Jupyter Notebooks/Data
+data/
+Data/
