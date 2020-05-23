@@ -19,7 +19,8 @@ package_list = [
     'requests',
     'scikit-learn',
     'seaborn',
-    'tensorflow-gpu==1.15',
+    'tensorflow',
+    # 'tensorflow-gpu==1.15',
     'xgboost',
 ]
 
