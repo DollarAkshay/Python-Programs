@@ -2,18 +2,19 @@ import json
 import requests
 import re
 
+league_name = 'Harvest'
 itemCount = {}
 tabIndices = [
-    7
+    2
 ]
 
 for tabIndex in tabIndices:
     url = "https://www.pathofexile.com/character-window/get-stash-items"
-    querystring = {"accountName": "DollarAkshay", "realm": "pc", "league": "Delirium", "tabs": "0", "tabIndex": tabIndex}
+    querystring = {"accountName": "DollarAkshay", "realm": "pc", "league": league_name, "tabs": "0", "tabIndex": tabIndex}
 
     headers = {
         'Content-Type': "application/json",
-        'cookie': "__cfduid=da4e431983544ed9e971c451238dc4bdd1587297172; POESESSID=17e5b30a86b6a6df4dc429d322d3696f",
+        'cookie': "__cfduid=d3e9e258a9fcb4f096c86edc33c373b1c1592360146; POESESSID=19344fe4e053e9537a8230ba6707bed1",
         'Cache-Control': "no-cache",
         'Postman-Token': "f0deb910-929f-d790-f5ed-e6f97b0a3600"
     }
